@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard ALyCs — Neix S.A.</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;background:#F5F4F0;color:#1a1a1a;font-size:14px;font-weight:400;-webkit-font-smoothing:antialiased}
+.hdr{background:#F5F4F0;padding:20px 32px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #e8e5e0}
+.hdr-left{display:flex;align-items:center;gap:20px}
+.hdr-text h1{font-family:'DM Serif Display',Georgia,serif;font-size:26px;font-weight:400;color:#1a1a1a;line-height:1.15;letter-spacing:-0.02em}
+.hdr-text p{font-size:12px;color:#888;margin-top:4px;letter-spacing:0.04em;text-transform:uppercase;font-weight:500}
+.hdr-right{display:flex;align-items:center;gap:14px}
+.ts{font-size:12px;color:#888}
+.btn{display:flex;align-items:center;gap:7px;background:#AB1930;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:.2s;font-family:'Inter',system-ui,sans-serif}
+.btn:hover{background:#8e1426}
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.btn.loading .spin{display:inline-block}.btn.loading .bt{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.nav-w{padding:12px 32px}
+.nav{display:flex;background:#ECEAE4;border-radius:10px;padding:4px;gap:2px}
+.tab{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:10px 6px;border-radius:7px;font-size:11px;font-weight:600;color:#888;cursor:pointer;transition:.15s;text-align:center;white-space:nowrap;font-family:'Inter',system-ui,sans-serif;letter-spacing:0.05em;text-transform:uppercase}
+.tab:hover{color:#333}
+.tab.on{background:#fff;color:#AB1930;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.c{padding:22px 32px;max-width:1440px;margin:0 auto}
+.panel{display:none}.panel.on{display:block}
+.sh h2{font-family:'DM Serif Display',Georgia,serif;font-size:24px;font-weight:400;margin-bottom:4px;letter-spacing:-0.02em}
+.sh p{font-size:12px;color:#9A8E7D;margin-bottom:20px;letter-spacing:0.01em}
+.card{background:#fff;border:1px solid #e8e5e0;border-radius:12px;padding:22px;margin-bottom:16px}
+.card0{background:#fff;border:1px solid #e8e5e0;border-radius:12px;padding:22px;margin-bottom:0;flex:1;min-width:0}
+.ctitle{font-family:'DM Serif Display',Georgia,serif;font-size:19px;font-weight:400;margin-bottom:16px;letter-spacing:-0.02em;color:#1a1a1a}
+.ctitle-sm{font-family:'DM Serif Display',Georgia,serif;font-size:16px;font-weight:400;margin-bottom:12px;letter-spacing:-0.01em;color:#1a1a1a}
+.kpi-grid{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid #e8e5e0;border-radius:10px;padding:18px 22px;flex:1;min-width:140px}
+.kpi-label{font-size:9.5px;color:#9A8E7D;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;font-weight:600}
+.kpi-value{font-family:'DM Serif Display',Georgia,serif;font-size:26px;font-weight:400;color:#1a1a1a;letter-spacing:-0.03em}
+.kpi-value.pos{color:#004836}.kpi-value.neg{color:#AB1930}
+.sel-w{position:relative;display:inline-block;min-width:320px}
+select{width:100%;padding:10px 36px 10px 14px;border:1px solid #ddd;border-radius:7px;font-size:14px;background:#fff;color:#1a1a1a;appearance:none;cursor:pointer;outline:none;font-family:'Inter',system-ui,sans-serif}
+.sa{position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:#888}
+.search-w{position:relative;margin-bottom:14px}
+.search-w input{width:100%;padding:9px 14px 9px 36px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:'Inter',system-ui,sans-serif;outline:none;background:#fafaf8;transition:.15s}
+.search-w input:focus{border-color:#AB1930;background:#fff}
+.search-w svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#aaa;pointer-events:none}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:#9A8E7D;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid #e8e5e0;white-space:nowrap;position:sticky;top:0;background:#fff;z-index:2;user-select:none}
+thead th.r{text-align:right}thead th.c{text-align:center}
+thead th.sortable{cursor:pointer}thead th.sortable:hover{color:#AB1930}
+.sort-icon{margin-left:4px;opacity:.4;font-size:10px}
+thead th.sort-asc .sort-icon::after{content:'▲';opacity:1;color:#AB1930}
+thead th.sort-desc .sort-icon::after{content:'▼';opacity:1;color:#AB1930}
+thead th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:'⇅'}
+tbody tr{border-bottom:1px solid #f2f0ec}tbody tr:last-child{border-bottom:none}
+tbody tr:hover td{background:#faf9f7}
+tbody td{padding:11px 12px;color:#1a1a1a;font-size:13px}
+tbody td.r{text-align:right}tbody td.c{text-align:center}
+tbody td.tp{color:#004836;font-weight:600}tbody td.tn{color:#AB1930;font-weight:600}tbody td.b{font-weight:700}
+tr.neix td{background:rgba(171,25,48,0.18)!important;border-top:1px solid rgba(171,25,48,0.35);border-bottom:1px solid rgba(171,25,48,0.35)!important}
+tr.neix:hover td{background:rgba(171,25,48,0.26)!important}
+.mini-bar-w{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.mini-bar{height:6px;border-radius:3px;min-width:2px;flex-shrink:0}
+.row3{display:flex;gap:14px;margin-bottom:16px}.row3>*{flex:1;min-width:0}
+.row2{display:flex;gap:14px;flex-wrap:wrap}.row2>*{flex:0 0 calc(50% - 7px);min-width:0;margin-bottom:14px}
+.rc3{display:flex;flex-direction:row;gap:14px;margin-bottom:16px}
+.rcard{background:#fff;border:1px solid #e8e5e0;border-radius:12px;padding:20px 22px;border-left:4px solid #ccc;flex:1;min-width:0}
+.rcard.a{border-left-color:#AB1930}.rcard.c{border-left-color:#004836}.rcard.r{border-left-color:#476785}
+.rl{font-size:11px;color:#888;margin-bottom:6px}
+.rn{font-family:'DM Serif Display',Georgia,serif;font-size:16px;font-weight:400;color:#1a1a1a;margin-bottom:6px;letter-spacing:-0.01em}
+.rleader-meta{display:flex;align-items:center;gap:8px}
+.rleader-badge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:24px;padding:0 8px;border-radius:5px;font-size:11px;font-weight:700;color:#fff;background:#004836;font-family:'Inter',system-ui,sans-serif;letter-spacing:0.02em}
+.rleader-tend{font-size:12px;font-weight:600}
+.rtabs{display:flex;gap:4px;margin-bottom:4px}
+.rtab{padding:8px 18px;border-radius:20px;font-size:13px;font-weight:500;color:#666;cursor:pointer;border:1px solid #e0ddd8;background:#fff;transition:.15s;font-family:'Inter',system-ui,sans-serif}
+.rtab.on{background:#AB1930;color:#fff;border-color:#AB1930}
+.rank-date{font-size:12px;color:#9A8E7D;margin-bottom:12px;padding-left:4px;display:flex;align-items:center;gap:6px}
+.rbadge{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:28px;padding:0 8px;border-radius:6px;font-size:12px;font-weight:700;color:#fff}
+.tend-wrap{position:relative;display:inline-block;cursor:default}
+.tend-tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#3D3D3D;color:#E4E4E4;font-size:12px;padding:7px 12px;border-radius:7px;white-space:nowrap;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.tend-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#3D3D3D}
+.tend-wrap:hover .tend-tip{display:block}
+.note{font-size:11px;color:#888;margin-top:12px;padding:9px 14px;background:#faf9f7;border-radius:6px;border-left:3px solid #e0ddd8;font-style:italic}
+.neix-rank{font-size:11px;color:#AB1930;font-weight:600;padding:4px 10px;background:rgba(171,25,48,0.08);border-radius:20px;display:inline-block}
+.nx-ov{position:absolute;left:0;right:0;background:rgba(171,25,48,0.20);border-left:4px solid rgba(171,25,48,0.8);pointer-events:none;z-index:2;border-radius:0 4px 4px 0}
+.err-box{background:#fff0f2;border:1px solid #ffc5cc;border-radius:8px;padding:14px 18px;font-size:13px;color:#AB1930;margin-bottom:16px}
+.loading-overlay{position:fixed;inset:0;background:rgba(245,244,240,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px}
+.loading-spinner{width:40px;height:40px;border:3px solid #e8e5e0;border-top-color:#AB1930;border-radius:50%;animation:spin .8s linear infinite}
+.loading-text{font-family:'DM Serif Display',Georgia,serif;font-size:18px;color:#3D3D3D}
+.neix-summary{background:linear-gradient(135deg,rgba(171,25,48,0.06) 0%,rgba(171,25,48,0.02) 100%);border:1px solid rgba(171,25,48,0.2);border-radius:12px;padding:22px;margin-bottom:16px}
+.neix-summary h3{font-family:'DM Serif Display',Georgia,serif;font-size:17px;font-weight:400;color:#AB1930;margin-bottom:16px;letter-spacing:-0.01em}
+.neix-highlights{display:flex;flex-wrap:wrap;gap:10px}
+.nh{background:#fff;border:1px solid rgba(171,25,48,0.15);border-radius:8px;padding:12px 16px;flex:1;min-width:150px}
+.nh-label{font-size:10px;color:#9A8E7D;letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px}
+.nh-val{font-family:'DM Serif Display',Georgia,serif;font-size:20px;font-weight:400;color:#AB1930;letter-spacing:-0.02em}
+.nh-rank{font-size:11px;color:#888;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="lo" style="display:none"><div class="loading-spinner"></div><div class="loading-text">Actualizando datos...</div></div>
+<div class="hdr">
+  <div class="hdr-left">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 362" height="36" style="display:block;flex-shrink:0">
+      <polygon fill="#AB1930" points="903.6 134.65 941.09 78.2 985.97 78.2 948.48 134.65 903.6 134.65"/>
+      <rect fill="#3D3D3D" x="660.23" y="78.2" width="44.88" height="215.67"/>
+      <polygon fill="#3D3D3D" points="542.86 115.16 542.86 78.18 405.26 78.18 405.26 78.2 394.59 78.2 394.59 293.87 439.47 293.87 439.47 293.86 542.86 293.86 542.86 256.88 439.47 256.88 439.47 202.62 529.47 202.62 529.47 165.64 439.47 165.64 439.47 115.16 542.86 115.16"/>
+      <polygon fill="#3D3D3D" points="277.26 293.08 277.26 78.2 235.28 78.2 235.28 230 134.24 78.2 89.36 78.2 89.38 78.23 89.3 78.2 89.3 293.98 131.28 293.98 131.28 141.19 232.91 293.87 277.79 293.87 277.26 293.08"/>
+      <polygon fill="#3D3D3D" points="989.85 293.87 846.31 78.2 801.42 78.2 869.57 180.59 794.17 293.87 839.05 293.87 892.01 214.31 944.97 293.87 989.85 293.87"/>
+    </svg>
+    <div class="hdr-text"><h1>Dashboard ALyCs</h1><p>Comparacion de Agentes de Liquidacion y Compensacion</p></div>
+  </div>
+  <div class="hdr-right">
+    <span class="ts">⏱ <span id="ts">Datos del Excel</span></span>
+    <button class="btn" id="btnRef" onclick="refreshFromSheets()">
+      <span class="spin"></span>
+      <span class="bt"><svg width="14" height="14" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-3"/></svg> Actualizar desde Sheets</span>
+    </button>
+  </div>
+</div>
+<div class="nav-w"><div class="nav">
+  <div class="tab on" onclick="gt(0)"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg> Resumen</div>
+  <div class="tab" onclick="gt(1)"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Sit. Patrimonial</div>
+  <div class="tab" onclick="gt(2)"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg> Est. Resultados</div>
+  <div class="tab" onclick="gt(3)"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg> Indicadores</div>
+  <div class="tab" onclick="gt(4)"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg> Rankings BYMA</div>
+  <div class="tab" onclick="gt(5)"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Neix vs Mercado</div>
+</div></div>
+<div class="c">
+<div class="panel on" id="p0">
+  <div id="err-box" class="err-box" style="display:none"></div>
+  <div class="sh"><h2>Resumen por ALyC</h2><p>Seleccioná una ALyC para ver sus indicadores clave</p></div>
+  <div class="card"><div style="font-family:'DM Serif Display',Georgia,serif;font-size:15px;font-weight:600;margin-bottom:14px">Seleccionar ALyC</div><div class="sel-w"><select id="sel0" onchange="updResumen()"></select><span class="sa">▾</span></div></div>
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <div class="card"><div class="ctitle" id="r-title"></div><div style="position:relative;height:320px"><canvas id="ch-r"></canvas></div></div>
+</div>
+<div class="panel" id="p1">
+  <div class="sh"><h2>Situacion Patrimonial</h2><p>Composición por ALyC</p></div>
+  <div class="card"><div style="font-family:'DM Serif Display',Georgia,serif;font-size:15px;font-weight:600;margin-bottom:14px">Seleccionar ALyC</div><div class="sel-w"><select id="sel1" onchange="updPatChart()"></select><span class="sa">▾</span></div></div>
+  <div class="card"><div class="ctitle" id="cht"></div><div style="position:relative;height:350px"><canvas id="ch0"></canvas></div></div>
+  <div class="card">
+    <div class="ctitle">Situacion Patrimonial — Todas las ALyCs</div>
+    <div class="search-w"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" placeholder="Buscar ALyC..." oninput="filterAndRender('pat')"></div>
+    <div class="tw" style="max-height:480px;overflow-y:auto"><table id="tbl-pat"><thead><tr>
+      <th class="sortable" onclick="sortTable('pat','n',this)">ALyC <span class="sort-icon"></span></th>
+      <th class="sortable" onclick="sortTable('pat','f',this)">Fecha <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('pat','pn',this)">Patrimonio Neto <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('pat','ac',this)">Activo Cte. <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('pat','anc',this)">Activo No Cte. <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('pat','at',this)">Total Activo <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('pat','pc',this)">Pasivo Cte. <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('pat','pnc',this)">Pasivo No Cte. <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('pat','pt',this)">Total Pasivo <span class="sort-icon"></span></th>
+    </tr></thead><tbody id="tbp"></tbody></table></div>
+  </div>
+</div>
+<div class="panel" id="p2">
+  <div class="row3">
+    <div class="card0"><div class="ctitle-sm">Top 10 — Mayor ROE</div><div style="position:relative;height:380px" id="wrap-c-roe"><canvas id="c-roe"></canvas></div></div>
+    <div class="card0"><div class="ctitle-sm">Top 10 — Mayor ROA</div><div style="position:relative;height:380px" id="wrap-c-roa"><canvas id="c-roa"></canvas></div></div>
+    <div class="card0"><div class="ctitle-sm">Top 10 — Mayor Margen Neto <span style="font-size:11px;font-weight:400;color:#888">(excl. Centaurus)</span></div><div style="position:relative;height:380px" id="wrap-c-mar"><canvas id="c-mar"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">Estado de Resultados — Todas las ALyCs</div>
+    <div class="search-w"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" placeholder="Buscar ALyC..." oninput="filterAndRender('eerr')"></div>
+    <div class="tw" style="max-height:480px;overflow-y:auto"><table id="tbl-eerr"><thead><tr>
+      <th class="sortable" onclick="sortTable('eerr','n',this)">ALyC <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('eerr','res',this)">Resultado Periodo <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('eerr','it',this)">Ingresos Tot. <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('eerr','gtAbs',this)">Gastos Tot. <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('eerr','iigg',this)">IIGG <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('eerr','gc',this)">Gastos Comerc. <span class="sort-icon"></span></th>
+      <th class="r sortable" onclick="sortTable('eerr','ga',this)">Gastos Admin. <span class="sort-icon"></span></th>
+    </tr></thead><tbody id="tbr"></tbody></table></div>
+  </div>
+</div>
+<div class="panel" id="p3">
+  <div class="sh"><h2>Indicadores Financieros</h2><p>Los 7 indicadores clave. La línea punteada muestra el promedio del mercado.</p></div>
+  <div class="row2" id="ig"></div>
+</div>
+<div class="panel" id="p4">
+  <div class="sh"><h2>Rankings BYMA</h2><p>Posicionamiento de ALyCs en el mercado por tipo de instrumento</p></div>
+  <div class="rc3" id="rank-leaders"></div>
+  <div class="card">
+    <div class="rtabs"><div class="rtab on" onclick="rt('r',this)">Renta Fija</div><div class="rtab" onclick="rt('a',this)">Acciones</div><div class="rtab" onclick="rt('c',this)">CEDEARs</div></div>
+    <div class="rank-date"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span id="rank-date-text"></span></div>
+    <div class="search-w"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="rank-search" placeholder="Buscar ALyC..." oninput="renderR()"></div>
+    <div id="rtw"></div>
+    <div class="note">* Tendencia: comparación vs ranking anterior. ↑ mejoró posición, ↓ descendió. Pasá el cursor sobre la flecha para ver cuántos puestos.</div>
+  </div>
+</div>
+<div class="panel" id="p5">
+  <div class="sh"><h2>Neix vs. Mercado</h2><p>Posicionamiento de Neix S.A. frente al universo de ALyCs en cada indicador clave</p></div>
+  <div id="neix-summary-panel"></div>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ── GOOGLE SHEETS URLs ─────────────────────────────────────────
+const URL_CUENTAS     = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkRaKVKySeeZfPsU6PD8aEjro7l1geWFWBqs4coLy_Vz9ZR3rZjiulP_1_cUMP7Q/pub?gid=2070707908&single=true&output=csv";
+const URL_INDICADORES = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkRaKVKySeeZfPsU6PD8aEjro7l1geWFWBqs4coLy_Vz9ZR3rZjiulP_1_cUMP7Q/pub?gid=453334906&single=true&output=csv";
+const URL_RANKING     = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkRaKVKySeeZfPsU6PD8aEjro7l1geWFWBqs4coLy_Vz9ZR3rZjiulP_1_cUMP7Q/pub?gid=617351758&single=true&output=csv";
+
+// ── INITIAL DATA (hardcoded from last Excel upload) ───────────
+// These are the fallback data shown immediately on page load.
+// When user clicks "Actualizar desde Sheets", fresh data is fetched.
+let D = [{"n": "Max Capital SA", "f": "31/12/25", "ac": 419976520299.0, "anc": 4226961859.0, "at": 424203482158.0, "pc": 395637323169.0, "pnc": 837310465.0, "pt": 396474633634.0, "pn": 27728848524.0, "isv": 79297076183.0, "ga": -12592165197.0, "gc": -24817712863.0, "iigg": 786067494.0, "res": 12027308855.0, "it": 80538564799, "gt": 69297323438, "gtAbs": 69297323438, "nx": false, "isCentaurus": false, "mar": 0.1493360216315816, "roe": 0.433747144, "apal": 14.29827255, "roa": 0.02835268771, "liq": 1.061518961, "ef": 0.8604241162, "ipe": 575275462.9}, {"n": "Mills Capital Markets S.A.", "f": "31/12/25", "ac": 167003350932.0, "anc": 5553056502.0, "at": 172556407434.0, "pc": 151585412866.0, "pnc": 0.0, "pt": 151585412866.0, "pn": 19121891705.0, "isv": 32837225377.0, "ga": -23195796518.0, "gc": -9377518242.0, "iigg": -430543835.0, "res": -1628094196.0, "it": 45349736944, "gt": 46547287305, "gtAbs": 46547287305, "nx": false, "isCentaurus": false, "mar": -0.035900852038247714, "roe": -0.08514294616, "apal": 7.92732305, "roa": -0.009435141935, "liq": 1.101711225, "ef": 1.026406997, "ipe": 944786186.3}, {"n": "Balanz Capital", "f": "30/06/25", "ac": 1054621015902.0, "anc": 14485418858.0, "at": 1069106434760.0, "pc": 1022537558722.0, "pnc": 3578342348.0, "pt": 1026115901070, "pn": 42990533690.0, "isv": 151887674186.0, "ga": -52130964994.0, "gc": -198110818844.0, "iigg": 2318381067.0, "res": 4400428217, "it": 412276728404, "gt": 410194681254, "gtAbs": 410194681254, "nx": false, "isCentaurus": false, "mar": 0.010673481945087895, "roe": 0.1023580737, "apal": 23.86841504, "roa": 0.004115987028, "liq": 1.031376312, "ef": 0.9949498795, "ipe": 285906191.7}, {"n": "Inviu S.A.U", "f": "31/12/25", "ac": 162959241933.0, "anc": 5044515870.0, "at": 168003757803.0, "pc": 155441321411.0, "pnc": null, "pt": 155441321411.0, "pn": 12562436392.0, "isv": 56151120065.0, "ga": -10063372913.0, "gc": -16188550522.0, "iigg": 586625876.0, "res": -5048363315, "it": 91344893017, "gt": 96979882208, "gtAbs": 96979882208, "nx": false, "isCentaurus": false, "mar": -0.05526705597061086, "roe": -0.4018618011, "apal": 12.37350117, "roa": -0.0300491095, "liq": 1.048365007, "ef": 1.061689154, "ipe": 493756178.5}, {"n": "Allaria S.A.", "f": "31/08/25", "ac": 467006840557.0, "anc": 304611707877.0, "at": 771618548434.0, "pc": 341874669343.0, "pnc": 0.0, "pt": 341874669343.0, "pn": 429743879090.0, "isv": 41783699577.0, "ga": -81486498854.0, "gc": 0.0, "iigg": -1950677725.0, "res": 101520067007.0, "it": 192064889680, "gt": 88594144948, "gtAbs": 88594144948, "nx": false, "isCentaurus": false, "mar": 0.5285717091559158, "roe": 0.2362338871, "apal": 0.7955312128, "roa": 0.1315676861, "liq": 1.366017674, "ef": 0.4612719435, "ipe": 412156415.6}, {"n": "Cohen S.A.", "f": "31/12/25", "ac": 126958192850.0, "anc": 5975021756.0, "at": 132933214606.0, "pc": 125894832757.0, "pnc": 3432395.0, "pt": 125898265152.0, "pn": 7034949454.0, "isv": 5113648623.0, "ga": -1954563149.0, "gc": -3983785250.0, "iigg": -195234959.0, "res": 516250058, "it": 17642930642, "gt": 16931445625, "gtAbs": 16931445625, "nx": false, "isCentaurus": false, "mar": 0.029261014990958324, "roe": 0.07338362008, "apal": 17.8961151, "roa": 0.003883529482, "liq": 1.008446416, "ef": 0.959673082, "ipe": 176429306.4}, {"n": "Neix S.A.", "f": "31/12/25", "ac": 72701170639.0, "anc": 576570413.0, "at": 73277741052.0, "pc": 61210272953.0, "pnc": 125005073.0, "pt": 61335278026.0, "pn": 11942463026.0, "isv": 5397566434.0, "ga": -13172049622.0, "gc": -4272239094.0, "iigg": -569245794.0, "res": 2282884660.0, "it": 20296419170, "gt": 17444288716, "gtAbs": 17444288716, "nx": true, "isCentaurus": false, "mar": 0.11247721289548042, "roe": 0.1911569376, "apal": 5.135898507, "roa": 0.03115386238, "liq": 1.187728254, "ef": 0.8594761751, "ipe": 281894710.7}, {"n": "Puente Hnos. S.A.", "f": "31/12/25", "ac": 268019801830.0, "anc": 5922481670.0, "at": 273942283500.0, "pc": 245952040423.0, "pnc": 15537368161.0, "pt": 261489408584.0, "pn": 12452874916.0, "isv": 16442114992.0, "ga": -15782228061.0, "gc": -41818915407.0, "iigg": -3599821777.0, "res": 5233698324.0, "it": 79992870763, "gt": 71159350662, "gtAbs": 71159350662, "nx": false, "isCentaurus": false, "mar": 0.0654270596126774, "roe": 0.4202803256, "apal": 20.99831648, "roa": 0.01910511315, "liq": 1.08972384, "ef": 0.8895711578, "ipe": 353950755.6}, {"n": "GMC VALORES S.A", "f": "31/12/25", "ac": 384403153563.0, "anc": 10495337125.0, "at": 394898490688.0, "pc": 368954628995.0, "pnc": 0.0, "pt": 368954628995.0, "pn": 25943861693.0, "isv": 33841736364.0, "ga": -6666844796.0, "gc": -9368745659.0, "iigg": -3478489247.0, "res": -2235693279.0, "it": 33841736364, "gt": 32598940396, "gtAbs": 32598940396, "nx": false, "isCentaurus": false, "mar": -0.06606319649065864, "roe": -0.08617426756, "apal": 14.22126873, "roa": -0.005661437893, "liq": 1.041871069, "ef": 0.9632762352, "ipe": 554782563.3}, {"n": "DRACMA INVESTMENTS S.A", "f": "30/09/25", "ac": 31965981285.0, "anc": 18298379.0, "at": 31984279664.0, "pc": 26394884775.0, "pnc": 0.0, "pt": 26394884775.0, "pn": 5589394889.0, "isv": 6375280786.0, "ga": -2531300403.0, "gc": -7630021270.0, "iigg": 0.0, "res": 1174695675.0, "it": 12577266430, "gt": 11402570755, "gtAbs": 11402570755, "nx": false, "isCentaurus": false, "mar": 0.09339832956055141, "roe": 0.2101650891, "apal": 4.722315259, "roa": 0.03672728251, "liq": 1.211067279, "ef": 0.9066016704, "ipe": 598917449}, {"n": "Bull Market Brokers", "f": "30/09/25", "ac": 783490726944.0, "anc": 2502522063.0, "at": 785993249007.0, "pc": 775845370640.0, "pnc": 68374034.0, "pt": 775913744674.0, "pn": 10079504333.0, "isv": 28964855301.0, "ga": -18959388235.0, "gc": -20122909604.0, "iigg": -1901088777.0, "res": 1278851235.0, "it": 43918201431, "gt": 40738261419, "gtAbs": 40738261419, "nx": false, "isCentaurus": false, "mar": 0.029118934595015383, "roe": 0.1268764011, "apal": 76.97935524, "roa": 0.001627051169, "liq": 1.009854227, "ef": 0.9275940292, "ipe": 283343235}, {"n": "Invertir en Bolsa S.A", "f": "31/12/25", "ac": 191403620990.0, "anc": 7051020115.0, "at": 198454641105.0, "pc": 157716862537.0, "pnc": 7024625805.0, "pt": 164741488342.0, "pn": 33713152763.0, "isv": 23122099218.0, "ga": -34172956468.0, "gc": -4548693918.0, "iigg": -4110160565.0, "res": 7044375764.0, "it": 23122099218, "gt": 11967562889, "gtAbs": 11967562889, "nx": false, "isCentaurus": false, "mar": 0.3046598709565316, "roe": 0.2089503706, "apal": 4.886564288, "roa": 0.03549615028, "liq": 1.213590087, "ef": 0.517581158, "ipe": 168774446.8}, {"n": "SBS TRADING S.A.", "f": "31/12/25", "ac": 699230350665.0, "anc": 893924865.0, "at": 700124275530.0, "pc": 657141379266.0, "pnc": 14820359.0, "pt": 657156199625.0, "pn": 42968075905.0, "isv": 20135956940.0, "ga": -22758934066.0, "gc": -4328874734.0, "iigg": -2122217518.0, "res": 7211853268.0, "it": 36421879586, "gt": 27087808800, "gtAbs": 27087808800, "nx": false, "isCentaurus": false, "mar": 0.19800881640309753, "roe": 0.1678421273, "apal": 15.29405694, "roa": 0.01030081875, "liq": 1.064048579, "ef": 0.7437235285, "ipe": 280168304.5}, {"n": "Latin Securities S.A.", "f": "30/09/25", "ac": 107125985420.0, "anc": 1347313465.0, "at": 108473298885, "pc": 94910407177.0, "pnc": 1119379.0, "pt": 94911526556, "pn": 13561772329.0, "isv": 21596632361.0, "ga": -18660583904.0, "gc": null, "iigg": -542159782, "res": 1621933755, "it": 22091479243, "gt": 19927385706, "gtAbs": 19927385706, "nx": false, "isCentaurus": false, "mar": 0.07341897467160026, "roe": 0.1195960023, "apal": 6.998460397, "roa": 0.01495237788, "liq": 1.128706415, "ef": 0.9020394464, "ipe": 251039536.9}, {"n": "Cono Sur Investments", "f": "31/12/25", "ac": 43465267751.0, "anc": 1742515212.0, "at": 45207782963.0, "pc": 39115970915.0, "pnc": 81696331.0, "pt": 39197667246.0, "pn": 6010115717.0, "isv": 37804673838.0, "ga": -4159404833.0, "gc": -3367823759.0, "iigg": -236372339.0, "res": 431178816.0, "it": 37933635760, "gt": 37266084605, "gtAbs": 37266084605, "nx": false, "isCentaurus": false, "mar": 0.011366661996967517, "roe": 0.07174218206, "apal": 6.521948843, "roa": 0.009537712043, "liq": 1.111189796, "ef": 0.9824021309, "ipe": 468316490.9}, {"n": "Alchemy Valores", "f": "31/12/25", "ac": 93534741367.0, "anc": 1305697413.0, "at": 94840438780, "pc": 86310257144.0, "pnc": 288523078.0, "pt": 86598780222, "pn": 8241658558.0, "isv": 3818206011.0, "ga": -7588073376, "gc": -840674597, "iigg": -286250646, "res": 1834458700, "it": 10549457319, "gt": 8428747973, "gtAbs": 8428747973, "nx": false, "isCentaurus": false, "mar": 0.17389128601867185, "roe": 0.2225836811, "apal": 10.50744575, "roa": 0.01934257922, "liq": 1.083703658, "ef": 0.7989745556, "ipe": 245336216.7}, {"n": "Adcap", "f": "31/12/25", "ac": 363948262185.0, "anc": 7461334899.0, "at": 371409597084, "pc": 357296342583.0, "pnc": 379002915.0, "pt": 357675345498, "pn": 13734251586.0, "isv": 40017109672.0, "ga": -8791147768, "gc": -7854983707, "iigg": -595151557, "res": 2483762761, "it": 40017109672, "gt": 36938195354, "gtAbs": 36938195354, "nx": false, "isCentaurus": false, "mar": 0.06206752015220856, "roe": 0.1808444199, "apal": 26.04257999, "roa": 0.006687395211, "liq": 1.018617374, "ef": 0.9230600525, "ipe": 228669198.1}, {"n": "Cocos Capital", "f": "31/12/25", "ac": 757364485000.0, "anc": 7843745000.0, "at": 765208230000, "pc": 698951359000.0, "pnc": 174800000.0, "pt": 699126159000, "pn": 66082071000.0, "isv": 30243558000.0, "ga": -21630512000, "gc": -19046300000, "iigg": -6591752000, "res": 14661552000, "it": 62036145000, "gt": 40782841000, "gtAbs": 40782841000, "nx": false, "isCentaurus": false, "mar": 0.23633886341583604, "roe": 0.2218688334, "apal": 10.57966478, "roa": 0.01916021212, "liq": 1.083572519, "ef": 0.6574045018, "ipe": 364918500}, {"n": "Centaurus Securities S.A.", "f": "31/12/25", "ac": 201157427005.0, "anc": 15596689094.0, "at": 216754116099, "pc": 176274831002.0, "pnc": null, "pt": 176274831002, "pn": 40479285097.0, "isv": 1272820148.0, "ga": -28522400337.0, "gc": -2267732854, "iigg": -8099457595, "res": 20533758783, "it": 59423349569, "gt": 30790133191, "gtAbs": 30790133191, "nx": false, "isCentaurus": true, "mar": 0.3455503422801339, "roe": 0.5072658456, "apal": 4.354692297, "roa": 0.09473295895, "liq": 1.141157963, "ef": 0.5181487313, "ipe": 667678085}, {"n": "DA VALORES S.A.", "f": "31/07/25", "ac": 47906042717.0, "anc": 945485937.0, "at": 48851528654, "pc": 41846127237.0, "pnc": 457698264.0, "pt": 42303825501, "pn": 6547703153.0, "isv": 16482138288.0, "ga": -9129413505.0, "gc": -856541120.0, "iigg": -798934666.0, "res": 4660098465, "it": 17386676090, "gt": 11927642959, "gtAbs": 11927642959, "nx": false, "isCentaurus": false, "mar": 0.2680269903734084, "roe": 0.7117149871, "apal": 6.460864904, "roa": 0.095393094, "liq": 1.144814249, "ef": 0.6860220376, "ipe": 395151729.3}, {"n": "CRITERIA WM S.A.", "f": "31/12/25", "ac": 179104860628.0, "anc": 222581774.0, "at": 179327442402.0, "pc": 174146751756.0, "pnc": null, "pt": 174146751756, "pn": 5180690646.0, "isv": 22750150836.0, "ga": -8078739387.0, "gc": -5681688816.0, "iigg": -305872215.0, "res": 1295999415, "it": 22750150836, "gt": 21148279206, "gtAbs": 21148279206, "nx": false, "isCentaurus": false, "mar": 0.05696662955522921, "roe": 0.2501595836, "apal": 33.61458224, "roa": 0.007226999937, "liq": 1.028470866, "ef": 0.9295885271, "ipe": 199562726.6}, {"n": "PP INVERSIONES S.A.", "f": "31/12/25", "ac": 367442540032.0, "anc": 5110399110.0, "at": 372552939142.0, "pc": 360822386628.0, "pnc": null, "pt": 360822386628.0, "pn": 11730552514.0, "isv": 56987944906.0, "ga": -12839702640.0, "gc": -30245008471.0, "iigg": -337244346.0, "res": -1576509029.0, "it": 56987944906, "gt": 58227209589, "gtAbs": 58227209589, "nx": false, "isCentaurus": false, "mar": -0.0276639038589724, "roe": -0.1343934164, "apal": 30.75919793, "roa": -0.00423163761, "liq": 1.018347402, "ef": 1.021746085, "ipe": 265060208.9}, {"n": "BUENOS AIRES VALORES S.A.", "f": "31/09/2025", "ac": 70526317442.0, "anc": 0.0, "at": 70526317442, "pc": 20227581576.0, "pnc": null, "pt": 20227581576, "pn": 50298735866.0, "isv": 6177841027.67, "ga": -4322680066.24, "gc": -5201323346.77, "iigg": 0.0, "res": 92705143.13, "it": 9993906665, "gt": 9901201522, "gtAbs": 9901201522, "nx": false, "isCentaurus": false, "mar": 0.00927616659205612, "roe": 0.001843090915, "apal": 0.4021489055, "roa": 0.001314475879, "liq": 3.486641108, "ef": 0.9907238334, "ipe": 195958954.2}];
+let RANK = {"a": [{"n": "ALLARIA S.A", "r": 1, "d": 0}, {"n": "INVERTIR EN BOLSA S.A.", "r": 2, "d": 0}, {"n": "BUENOS AIRES VALORES S.A.", "r": 3, "d": 0}, {"n": "COCOS CAPITAL S.A.", "r": 4, "d": 1}, {"n": "LATIN SECURITIES S.A", "r": 5, "d": 1}, {"n": "BALANZ CAPITAL VALORES S.A.U.", "r": 6, "d": -2}, {"n": "NEIX  S.A.", "r": 8, "d": 0}, {"n": "BULL MARKET BROKERS S.A.", "r": 9, "d": 0}, {"n": "INVIU S.A.U.", "r": 10, "d": 0}, {"n": "SBS TRADING S.A.", "r": 14, "d": 0}, {"n": "MAX CAPITAL S.A.", "r": 16, "d": 19}, {"n": "ADCAP SECURITIES ARGENTINA S.A.", "r": 23, "d": -3}, {"n": "DA VALORES S.A.", "r": 24, "d": 21}, {"n": "PP INVERSIONES S.A.", "r": 25, "d": -3}, {"n": "Puente Hnos. S.A.", "r": 28, "d": 2}, {"n": "COHEN S.A.", "r": 31, "d": -4}, {"n": "ALCHEMY VALORES S.A.", "r": 34, "d": -17}, {"n": "GMC VALORES S.A.", "r": 44, "d": 5}, {"n": "DRACMA INVESTMENTS  S.A.", "r": 45, "d": -4}, {"n": "CONO SUR INVERSIONES S.A.", "r": 51, "d": 12}, {"n": "Centaurus Securities S.A.", "r": 52, "d": 23}, {"n": "CRITERIA WM S.A", "r": 75, "d": -8}, {"n": "MILLS CAPITAL MARKETS S.A", "r": 188, "d": -30}], "c": [{"n": "ALLARIA S.A", "r": 1, "d": 0}, {"n": "INVERTIR EN BOLSA S.A.", "r": 2, "d": 0}, {"n": "BUENOS AIRES VALORES S.A.", "r": 3, "d": 0}, {"n": "BALANZ CAPITAL VALORES S.A.U.", "r": 4, "d": 1}, {"n": "COCOS CAPITAL S.A.", "r": 7, "d": 0}, {"n": "SBS TRADING S.A.", "r": 8, "d": -4}, {"n": "BULL MARKET BROKERS S.A.", "r": 9, "d": -1}, {"n": "NEIX  S.A.", "r": 10, "d": 0}, {"n": "LATIN SECURITIES S.A", "r": 11, "d": 0}, {"n": "INVIU S.A.U.", "r": 12, "d": 0}, {"n": "PP INVERSIONES S.A.", "r": 16, "d": 0}, {"n": "COHEN S.A.", "r": 19, "d": 2}, {"n": "Centaurus Securities S.A.", "r": 20, "d": 5}, {"n": "MAX CAPITAL S.A.", "r": 27, "d": 3}, {"n": "ADCAP SECURITIES ARGENTINA S.A.", "r": 41, "d": -7}, {"n": "GMC VALORES S.A.", "r": 49, "d": -25}, {"n": "DRACMA INVESTMENTS  S.A.", "r": 51, "d": 3}, {"n": "CONO SUR INVERSIONES S.A.", "r": 63, "d": 2}, {"n": "Puente Hnos. S.A.", "r": 72, "d": -13}, {"n": "DA VALORES S.A.", "r": 75, "d": 2}, {"n": "CRITERIA WM S.A", "r": 77, "d": 31}, {"n": "ALCHEMY VALORES S.A.", "r": 94, "d": -47}, {"n": "MILLS CAPITAL MARKETS S.A", "r": 143, "d": 26}], "r": [{"n": "ALLARIA S.A", "r": 1, "d": 0}, {"n": "DA VALORES S.A.", "r": 4, "d": -2}, {"n": "NEIX  S.A.", "r": 5, "d": -1}, {"n": "COCOS CAPITAL S.A.", "r": 6, "d": 4}, {"n": "BULL MARKET BROKERS S.A.", "r": 7, "d": 29}, {"n": "Centaurus Securities S.A.", "r": 9, "d": 2}, {"n": "BALANZ CAPITAL VALORES S.A.U.", "r": 10, "d": -2}, {"n": "GMC VALORES S.A.", "r": 12, "d": -3}, {"n": "BUENOS AIRES VALORES S.A.", "r": 15, "d": 11}, {"n": "INVERTIR EN BOLSA S.A.", "r": 16, "d": -2}, {"n": "LATIN SECURITIES S.A", "r": 22, "d": 1}, {"n": "SBS TRADING S.A.", "r": 26, "d": 3}, {"n": "CONO SUR INVERSIONES S.A.", "r": 27, "d": 1}, {"n": "PP INVERSIONES S.A.", "r": 29, "d": -7}, {"n": "MAX CAPITAL S.A.", "r": 33, "d": -3}, {"n": "CRITERIA WM S.A", "r": 35, "d": 2}, {"n": "COHEN S.A.", "r": 37, "d": -4}, {"n": "ADCAP SECURITIES ARGENTINA S.A.", "r": 40, "d": -5}, {"n": "INVIU S.A.U.", "r": 41, "d": -2}, {"n": "Puente Hnos. S.A.", "r": 44, "d": -1}, {"n": "MILLS CAPITAL MARKETS S.A", "r": 67, "d": 29}, {"n": "ALCHEMY VALORES S.A.", "r": 75, "d": 7}, {"n": "DRACMA INVESTMENTS  S.A.", "r": 90, "d": -15}]};
+let RANK_DATE_CURR = "mayo 2026", RANK_DATE_PREV = "abril 2026";
+
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+// ── CSV PARSER ─────────────────────────────────────────────────
+function parseCSV(text){
+  return text.split('\n').map(line=>{
+    const row=[];let cur='',inQ=false;
+    for(let i=0;i<line.length;i++){
+      if(line[i]==='"'){inQ=!inQ;}
+      else if(line[i]===','&&!inQ){row.push(cur.trim());cur='';}
+      else cur+=line[i];
+    }
+    row.push(cur.trim());return row;
+  });
+}
+async function fetchCSV(url){
+  const r=await fetch(url);
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return parseCSV(await r.text());
+}
+function pnS(v){
+  // Handles all Google Sheets formats including percentages like 19,11% or 19.11%
+  if(v==null||v===''||v===undefined)return null;
+  const s=String(v).trim();
+  if(['#NAME?','#VALUE!','#REF!','#N/A','#DIV/0!','#NULL!'].includes(s)||s==='-'||s==='—')return null;
+  const isPercent=s.includes('%');
+  const neg=s.startsWith('(')||s.startsWith('-');
+  let c=s.replace(/[()$%x\s]/g,'').replace(/^-/,'');
+  if(c.includes('.')&&c.includes(',')){
+    const ld=c.lastIndexOf('.');const lc=c.lastIndexOf(',');
+    if(lc>ld){c=c.replace(/\./g,'').replace(',','.');}
+    else{c=c.replace(/,/g,'');}
+  } else if(c.includes('.')&&!c.includes(',')){
+    if(c.split('.').length>2){c=c.replace(/\./g,'');}
+    // single dot = decimal, keep as is
+  } else if(c.includes(',')&&!c.includes('.')){
+    const parts=c.split(',');
+    if(parts.length>2){c=c.replace(/,/g,'');}
+    else{c=c.replace(',','.');}
+  }
+  let r=parseFloat(c);
+  if(isNaN(r))return null;
+  // If value came as percentage (e.g. "19,11%"), divide by 100 to get ratio
+  if(isPercent)r=r/100;
+  return neg?-Math.abs(r):r;
+}
+
+// ── REFRESH FROM SHEETS ────────────────────────────────────────
+async function refreshFromSheets(silent){
+  const btn=document.getElementById('btnRef');
+  btn.classList.add('loading');
+  if(!silent)document.getElementById('lo').style.display='flex';
+  document.getElementById('err-box').style.display='none';
+  try{
+    const [cR,iR,rR]=await Promise.all([fetchCSV(URL_CUENTAS),fetchCSV(URL_INDICADORES),fetchCSV(URL_RANKING)]);
+    // Parse Cuentas
+    const hdr=cR[0]||[];const newD=[];
+    for(let c=1;c<hdr.length;c++){
+      const full=String(hdr[c]||'').trim();if(!full)continue;
+      let nombre=full,fecha='';
+      const m=full.match(/^(.+?)\s*[-–]\s*(\d{1,2}\/\d{2}\/\d{2,4})$/);
+      const m2=full.match(/^(.+?)\s+(\d{1,2}\/\d{2}\/\d{2,4})$/);
+      if(m){nombre=m[1].trim();fecha=m[2];}else if(m2){nombre=m2[1].trim();fecha=m2[2];}
+      const g=ri=>cR[ri]&&c<cR[ri].length?pnS(cR[ri][c]):null;
+      const a={n:nombre,f:fecha,ac:g(1),anc:g(2),at:g(3),pc:g(4),pnc:g(5),pt:g(6),pn:g(7),
+               isv:g(11),ga:g(15),gc:g(16),iigg:g(22),res:g(23),it:g(25),gt:g(26)};
+      a.gtAbs=a.gt!=null?Math.abs(a.gt):null;
+      a.nx=a.n.toLowerCase().includes('neix');
+      a.isCentaurus=a.n.toLowerCase().includes('centaurus');
+      a.mar=(a.it&&a.res!=null)?a.res/a.it:null;
+      newD.push(a);
+    }
+    // Parse Indicadores
+    newD.forEach((a,idx)=>{
+      const c=idx+1;const gi=ri=>iR[ri]&&c<iR[ri].length?pnS(iR[ri][c]):null;
+      a.roe=gi(1);a.apal=gi(2);a.roa=gi(3);a.liq=gi(4);a.ef=gi(5);a.ipe=gi(8);
+      a.mar=(a.it&&a.res!=null)?a.res/a.it:null;
+    });
+    // Parse Ranking
+    const names=(rR[0]||[]).slice(1).filter(Boolean).map(v=>String(v).trim());
+    const parseDC=v=>{
+  if(!v||v===''||v===null||v===undefined)return null;
+  const s=String(v).trim();
+  // Excel serial number (Google Sheets exports dates as serials like 46142 for 2026-04-30)
+  // Excel serials for years 2020-2030 are roughly 43831-48213
+  const serial=parseFloat(s);
+  if(!isNaN(serial)&&serial>40000&&serial<60000&&!s.includes('-')&&!s.includes('/')){
+    const d=new Date(Date.UTC(1899,11,30)+Math.round(serial)*86400000);
+    return MESES[d.getUTCMonth()]+' '+d.getUTCFullYear();
+  }
+  // ISO format: 2026-05-31
+  const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(iso)return MESES[parseInt(iso[2])-1]+' '+iso[1];
+  // DD/MM/YYYY
+  const dmy=s.match(/^(\d{1,2})\/(\d{2})\/(\d{4})$/);
+  if(dmy)return MESES[parseInt(dmy[2])-1]+' '+dmy[3];
+  // MM/DD/YYYY
+  const mdy=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(mdy)return MESES[parseInt(mdy[1])-1]+' '+mdy[3];
+  return s;
+};
+    const dc=parseDC(rR[4]?rR[4][0]:null);const dp=parseDC(rR[10]?rR[10][0]:null);
+    if(dc)RANK_DATE_CURR=dc;if(dp)RANK_DATE_PREV=dp;
+    const bR=(vals,diffs,ns)=>ns.map((n,i)=>({n,r:pnS(vals[i]),d:pnS(diffs[i])})).filter(x=>x.r!=null&&!isNaN(x.r)).sort((a,b)=>a.r-b.r).map(x=>({...x,r:Math.round(x.r),d:x.d!=null?Math.round(x.d):null}));
+    const sl=ri=>(rR[ri]||[]).slice(1);
+    RANK={a:bR(sl(3),sl(15),names),c:bR(sl(1),sl(13),names),r:bR(sl(2),sl(14),names)};
+    D=newD;
+    document.getElementById('ts').textContent='Datos actualizados: '+new Date().toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    window._p2=0;window._p3=0;window._p5=0;
+    renderAll();
+  }catch(err){
+    const eb=document.getElementById('err-box');
+    if(!silent){eb.textContent='No se pudo cargar desde Google Sheets: '+err.message;eb.style.display='block';}console.warn('Sheets fetch failed:',err.message);
+    eb.style.display='block';
+  }
+  btn.classList.remove('loading');
+  document.getElementById('lo').style.display='none';
+}
+
+// ── UTILS ──────────────────────────────────────────────────────
+const COMP_COLORS=['#AB1930','#004836','#476785','#9A8E7D','#003F61'];
+const PAL=['#3D3D3D','#AB1930','#9A8E7D','#004836','#476785','#003F61','#3D3D3D','#AB1930','#9A8E7D','#004836','#476785','#003F61','#3D3D3D','#AB1930','#9A8E7D','#004836','#476785','#003F61','#3D3D3D','#AB1930','#9A8E7D','#004836'];
+const COMP_LABELS=['Activo Corriente','Activo No Corriente','Pasivo Corriente','Pasivo No Corriente','Patrimonio Neto'];
+const INDS_DEF=[
+  {k:'roe',l:'ROE',lf:'ROE (Resultado del período / PN)',type:'pct2',exclCent:false},
+  {k:'apal',l:'Apalancamiento',lf:'Apalancamiento (Pasivo / PN)',type:'x',exclCent:false},
+  {k:'roa',l:'ROA',lf:'ROA (Resultado del periodo / Activo Total)',type:'pct2',exclCent:false},
+  {k:'liq',l:'Liquidez',lf:'Ratio de Liquidez (AC / PC)',type:'x',exclCent:false},
+  {k:'ef',l:'Eficiencia',lf:'Eficiencia Operativa (Gastos / Ingresos)',type:'pct2',exclCent:false},
+  {k:'mar',l:'Margen Neto',lf:'Margen Neto (Resultado / Ingresos Totales)',type:'pct2',exclCent:true},
+  {k:'ipe',l:'Gan. por Empleado',lf:'Ganancia por Empleado (Ingresos / Empleados)',type:'$',exclCent:false},
+];
+function fmtInd(t){if(t==='pct2')return v=>v==null||isNaN(v)?'—':(v*100).toFixed(2)+'%';if(t==='x')return v=>v==null||isNaN(v)?'—':v.toFixed(2)+'x';return fa;}
+function fa(v){if(v==null||isNaN(v))return'—';const n=Number(v),a=Math.abs(n),p=n<0?'-$':'$';if(a>=1e9)return p+(a/1e9).toFixed(1)+'B';if(a>=1e6)return p+(a/1e6).toFixed(0)+'M';if(a>=1e3)return p+(a/1e3).toFixed(0)+'K';return p+a.toFixed(0);}
+function sn(s,l=15){return s&&s.length>l?s.slice(0,l-1)+'…':s||'';}
+function calcGlobalMax(){let mx=0;D.forEach(a=>{[a.ac,a.anc,a.at,a.pc,a.pnc||0,a.pt,a.pn].forEach(v=>{if(v!=null&&Math.abs(v)>mx)mx=Math.abs(v);});});return mx;}
+function neixRank(k,ec){const v=D.filter(a=>a[k]!=null&&!(ec&&a.isCentaurus)).sort((a,b)=>b[k]-a[k]);const p=v.findIndex(a=>a.nx)+1;return p>0?{pos:p,total:v.length}:null;}
+function mktAvg(k,ec){const v=D.filter(a=>a[k]!=null&&!(ec&&a.isCentaurus)).map(a=>a[k]);return v.length?v.reduce((s,x)=>s+x,0)/v.length:null;}
+
+const sortState={pat:{col:'n',dir:1},eerr:{col:'n',dir:1}};
+let patFilter='',eerrFilter='';
+function sortTable(tbl,col,th){const st=sortState[tbl];if(st.col===col)st.dir*=-1;else{st.col=col;st.dir=-1;}document.getElementById('tbl-'+tbl).querySelectorAll('th').forEach(t=>t.classList.remove('sort-asc','sort-desc'));th.classList.add(st.dir===1?'sort-desc':'sort-asc');filterAndRender(tbl);}
+function filterAndRender(tbl){if(tbl==='pat'){patFilter=document.querySelector('#p1 .search-w input')?.value.toLowerCase()||'';renderPat();}else{eerrFilter=document.querySelector('#p2 .search-w input')?.value.toLowerCase()||'';renderEerr();}}
+function getSortedFiltered(tbl){const st=sortState[tbl];const q=tbl==='pat'?patFilter:eerrFilter;let arr=D.filter(a=>!q||a.n.toLowerCase().includes(q));return[...arr].sort((a,b)=>{const av=a[st.col],bv=b[st.col];if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return -1;if(typeof av==='string')return st.dir*av.localeCompare(bv);return st.dir*(bv-av);});}
+
+let CH={};
+function barLabels(fmtFn){return{id:'barLabels',afterDatasetsDraw(chart){
+  const{ctx,scales:{x}}=chart;
+  if(!x)return;
+  const zero=x.getPixelForValue(0);
+  chart.getDatasetMeta(0).data.forEach((bar,i)=>{
+    const raw=chart.data.datasets[0].data[i];
+    if(raw==null||isNaN(raw))return;
+    const txt=fmtFn(raw);
+    const barLen=Math.abs(bar.x-zero);
+    ctx.save();
+    ctx.font='600 11px Inter,system-ui,sans-serif';
+    ctx.fillStyle='rgba(255,255,255,0.95)';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    const tw=ctx.measureText(txt).width;
+    if(barLen>tw+14){
+      const cx=zero+(bar.x-zero)/2;
+      ctx.fillText(txt,cx,bar.y);
+    }
+    ctx.restore();
+  });
+}};}
+function mk2(id,cfg,fmtFn){
+  if(CH[id])CH[id].destroy();
+  const el=document.getElementById(id);if(!el)return;
+  if(fmtFn){
+    cfg.plugins=[...(cfg.plugins||[]), barLabels(fmtFn)];
+  }
+  CH[id]=new Chart(el,cfg);
+}
+function cOFixed(xMax){return{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fa(c.raw)}`}}},scales:{x:{min:0,max:xMax,grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:11},color:'#888',callback:fa}},y:{grid:{display:false},ticks:{font:{size:13,weight:'500'},color:'#1a1a1a'},afterFit(sc){sc.width=160;}}}};}
+function cO(fmt){return{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fmt(c.raw)}`}}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:11},color:'#888',callback:fmt}},y:{grid:{display:false},ticks:{font:{size:12,weight:'500'},color:'#1a1a1a'},afterFit(sc){sc.width=150;}}}};}
+
+function gt(i){document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('on',j===i));document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('on',j===i));if(i===2&&!window._p2){buildP2();window._p2=1;}if(i===3&&!window._p3){buildP3();window._p3=1;}if(i===4)renderR();if(i===5&&!window._p5){buildP5();window._p5=1;}}
+
+function updRankDate(){document.getElementById('rank-date-text').textContent=`Ranking BYMA — ${RANK_DATE_CURR}, comparado vs. ${RANK_DATE_PREV}`;}
+
+function renderAll(){
+  const sd=[...D].sort((a,b)=>a.n.localeCompare(b.n,'es'));
+  ['sel0','sel1'].forEach(id=>{const s=document.getElementById(id);const prev=s.value?D[+s.value]?.n:'';s.innerHTML='';sd.forEach(a=>{const i=D.indexOf(a);const o=document.createElement('option');o.value=i;o.textContent=a.n+' - '+a.f;if(a.n===prev)o.selected=true;s.appendChild(o);});});
+  updRankDate();updRankLeaders();updResumen();renderPat();renderEerr();updPatChart();
+  window._p2=0;window._p3=0;window._p5=0;
+  const cur=[...document.querySelectorAll('.panel')].findIndex(p=>p.classList.contains('on'));
+  if(cur===2){buildP2();window._p2=1;}if(cur===3){buildP3();window._p3=1;}if(cur===4)renderR();if(cur===5){buildP5();window._p5=1;}
+}
+
+function mkCompChart(id,data,barThick){
+  const xMax=calcGlobalMax();
+  
+  mk2(id,{type:'bar',data:{labels:COMP_LABELS,datasets:[{data,backgroundColor:COMP_COLORS,borderRadius:4,barThickness:barThick}]},options:{...cOFixed(xMax),indexAxis:'y'}},fa);
+}
+
+function updResumen(){
+  if(!D.length)return;
+  const a=D[+document.getElementById('sel0').value]||D[0];
+  const fPct=v=>v==null||isNaN(v)?'—':(v*100).toFixed(2)+'%';
+  const fX=v=>v==null||isNaN(v)?'—':v.toFixed(2)+'x';
+  document.getElementById('kpi-grid').innerHTML=[{l:'Activo Total',v:fa(a.at),c:null},{l:'Pasivo Total',v:fa(a.pt),c:null},{l:'Patrimonio Neto',v:fa(a.pn),c:a.pn},{l:'ROE',v:fPct(a.roe),c:a.roe},{l:'Apalancamiento',v:fX(a.apal),c:null}].map(k=>`<div class="kpi"><div class="kpi-label">${k.l}</div><div class="kpi-value ${k.c!=null?(k.c>=0?'pos':'neg'):''}">${k.v}</div></div>`).join('');
+  document.getElementById('r-title').textContent='Composicion — '+a.n;
+  mkCompChart('ch-r',[a.ac,a.anc,a.pc,a.pnc||0,a.pn],38);
+}
+function updPatChart(){
+  if(!D.length)return;
+  const a=D[+document.getElementById('sel1').value]||D[0];
+  document.getElementById('cht').textContent='Composicion Patrimonial — '+a.n;
+  mkCompChart('ch0',[a.ac,a.anc,a.pc,a.pnc||0,a.pn],44);
+}
+function renderPat(){
+  const arr=getSortedFiltered('pat');const maxAt=Math.max(...D.map(a=>a.at||0));
+  document.getElementById('tbp').innerHTML=arr.map(a=>{const bW=a.at?Math.round(a.at/maxAt*80):0;return`<tr class="${a.nx?'neix':''}"><td style="color:${a.nx?'#AB1930':'#1a1a1a'};font-weight:${a.nx?700:400}">${a.n}</td><td style="color:#aaa;font-size:12px">${a.f}</td><td class="r ${a.pn>=0?'tp':'tn'} b">${fa(a.pn)}</td><td class="r">${fa(a.ac)}</td><td class="r">${fa(a.anc)}</td><td class="r b"><div class="mini-bar-w">${fa(a.at)}<div class="mini-bar" style="width:${bW}px;background:${a.nx?'#AB1930':'#476785'};opacity:.5"></div></div></td><td class="r">${fa(a.pc)}</td><td class="r">${a.pnc?fa(a.pnc):'$0'}</td><td class="r">${fa(a.pt)}</td></tr>`;}).join('');
+}
+function renderEerr(){
+  const arr=getSortedFiltered('eerr');
+  document.getElementById('tbr').innerHTML=arr.map(a=>`<tr class="${a.nx?'neix':''}"><td style="color:${a.nx?'#AB1930':'#1a1a1a'};font-weight:${a.nx?700:400}">${a.n}</td><td class="r ${a.res!=null&&a.res>=0?'tp':'tn'} b">${fa(a.res)}</td><td class="r">${fa(a.it)}</td><td class="r tn">${fa(a.gtAbs)}</td><td class="r ${a.iigg!=null&&a.iigg>=0?'tp':'tn'}">${fa(a.iigg)}</td><td class="r" style="color:${a.gc!=null&&a.gc<0?'#AB1930':'#1a1a1a'}">${fa(a.gc)}</td><td class="r" style="color:${a.ga<0?'#AB1930':'#1a1a1a'}">${fa(a.ga)}</td></tr>`).join('');
+}
+function buildP2(){
+  if(!D.length)return;
+  const fPct=v=>v==null?'—':(v*100).toFixed(2)+'%';
+  function hbTop(id,wId,arr,k){const nI=arr.findIndex(a=>a.nx);
+
+const cfg={type:'bar',data:{labels:arr.map(a=>sn(a.n)),datasets:[{data:arr.map(a=>a[k]),backgroundColor:arr.map((a,i)=>a.nx?'rgba(171,25,48,0.75)':PAL[i]),borderRadius:4,barThickness:24}]},plugins:[barLabels(fPct)],options:{...cO(fPct),indexAxis:'y',animation:{onComplete(){if(nI<0)return;const w=document.getElementById(wId);if(!w)return;const o=w.querySelector('.nx-ov');if(o)o.remove();try{const b=this.getDatasetMeta(0).data[nI];if(!b)return;const ov=document.createElement('div');ov.className='nx-ov';ov.style.top=(b.y-b.height/2-5)+'px';ov.style.height=(b.height+10)+'px';w.appendChild(ov);}catch(e){}}}}};if(CH[id])CH[id].destroy();const el=document.getElementById(id);if(el)CH[id]=new Chart(el,cfg);}
+  hbTop('c-roe','wrap-c-roe',[...D].filter(d=>d.roe!=null).sort((a,b)=>b.roe-a.roe).slice(0,10),'roe');
+  hbTop('c-roa','wrap-c-roa',[...D].filter(d=>d.roa!=null).sort((a,b)=>b.roa-a.roa).slice(0,10),'roa');
+  hbTop('c-mar','wrap-c-mar',[...D].filter(d=>d.mar!=null&&!d.isCentaurus).sort((a,b)=>b.mar-a.mar).slice(0,10),'mar');
+}
+function buildP3(){
+  if(!D.length)return;const grid=document.getElementById('ig');grid.innerHTML='';
+  INDS_DEF.forEach(ind=>{
+    const fmt=fmtInd(ind.type);const s=[...D].filter(d=>d[ind.k]!=null&&!(ind.exclCent&&d.isCentaurus)).sort((a,b)=>b[ind.k]-a[ind.k]);
+    const h=Math.max(240,s.length*34+60);const neixIdx=s.findIndex(a=>a.nx);const rank=neixRank(ind.k,ind.exclCent);const avg=mktAvg(ind.k,ind.exclCent);
+    const div=document.createElement('div');div.className='card0';div.style.cssText='margin-bottom:14px;flex:0 0 calc(50% - 7px);position:relative';const cid='ci'+ind.k;
+    const lx=ind.exclCent?` <span style="font-size:10px;font-weight:400;color:#aaa">(excl. Centaurus)</span>`:'';
+    const rb=rank?`<span class="neix-rank">Neix: ${rank.pos}° de ${rank.total}</span>`:'';
+    div.innerHTML=`<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px"><div class="ctitle-sm" style="margin-bottom:0">${ind.lf}${lx}</div>${rb}</div><div style="position:relative;height:${h}px" id="wrap-${cid}"><canvas id="${cid}"></canvas></div>`;
+    grid.appendChild(div);
+    setTimeout(()=>{
+      const avgP={id:'al',afterDraw(c){if(avg==null)return;const{ctx,scales:{x,y}}=c;const xp=x.getPixelForValue(avg);ctx.save();ctx.beginPath();ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(61,61,61,0.35)';ctx.lineWidth=1.5;ctx.moveTo(xp,y.top);ctx.lineTo(xp,y.bottom);ctx.stroke();ctx.restore();ctx.save();ctx.font='500 9.5px Inter,system-ui,sans-serif';ctx.fillStyle='rgba(61,61,61,0.5)';ctx.fillText('prom.',xp+4,y.top+12);ctx.restore();}};
+      
+const chart=new Chart(document.getElementById(cid),{type:'bar',data:{labels:s.map(a=>sn(a.n,16)),datasets:[{data:s.map(a=>a[ind.k]),backgroundColor:s.map((a,i)=>PAL[i%PAL.length]),borderRadius:3,barThickness:17}]},plugins:[avgP,barLabels(fmt)],options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fmt(c.raw)}`}}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},color:'#888',callback:v=>fmt(v)}},y:{grid:{display:false},ticks:{font:{size:10},color:'#1a1a1a'},afterFit(sc){sc.width=130;}}},animation:{onComplete(){if(neixIdx<0)return;const w=document.getElementById('wrap-'+cid);const o=w.querySelector('.nx-ov');if(o)o.remove();try{const b=this.getDatasetMeta(0).data[neixIdx];if(!b)return;const ov=document.createElement('div');ov.className='nx-ov';ov.style.top=(b.y-b.height/2-5)+'px';ov.style.height=(b.height+10)+'px';w.appendChild(ov);}catch(e){}}}}}); if(CH[cid])CH[cid].destroy();CH[cid]=chart;},50);
+  });
+}
+function updRankLeaders(){
+  const mkCard=(tipo,icon,label,cls)=>{const first=RANK[tipo][0];if(!first)return`<div class="rcard ${cls}"><div class="rl">${icon} ${label}</div><div class="rn">—</div></div>`;const td=first.d;const tH=td!=null&&td!==0?(td>0?`<span class="rleader-tend" style="color:#004836">↑ ${td}</span>`:`<span class="rleader-tend" style="color:#AB1930">↓ ${Math.abs(td)}</span>`):'';return`<div class="rcard ${cls}"><div class="rl">${icon} ${label}</div><div class="rn">${first.n}</div><div class="rleader-meta"><span class="rleader-badge">#${first.r}</span>${tH}</div></div>`;};
+  document.getElementById('rank-leaders').innerHTML=mkCard('a','↗','Lider en Acciones','a')+mkCard('c','▦','Lider en CEDEARs','c')+mkCard('r','◎','Lider en Renta Fija','r');
+}
+function rt(t,el){document.querySelectorAll('.rtab').forEach(x=>x.classList.remove('on'));el.classList.add('on');curR=t;renderR();}
+let curR='r';
+function rbc(r){return r<=3?'#004836':r<=10?'#2a6654':r<=30?'#476785':r<=60?'#7a8a9a':'#9A8E7D';}
+function renderR(){
+  const q=(document.getElementById('rank-search')?.value||'').toLowerCase();
+  const allRows=RANK[curR];const rows=q?allRows.filter(r=>r.n.toLowerCase().includes(q)):allRows;
+  if(!rows||!rows.length){document.getElementById('rtw').innerHTML='<div style="padding:32px;text-align:center;color:#888">Sin datos de ranking.</div>';return;}
+  const tL={'a':'Acciones','c':'CEDEARs','r':'Renta Fija'}[curR];
+  document.getElementById('rtw').innerHTML=`<table><thead><tr><th>ALyC</th><th class="r" style="width:200px">Ranking ${RANK_DATE_CURR} — ${tL}</th><th class="c" style="width:160px">Cambio vs mes anterior</th></tr></thead><tbody>${rows.map(row=>{const nx=row.n.toLowerCase().includes('neix');const d=row.d;let tendHtml='<span style="font-size:13px;color:#888;font-weight:500">=</span>';
+    if(d!=null&&d!==0){
+      if(d>0){
+        tendHtml=`<span style="font-size:13px;font-weight:700;color:#004836">+${d}</span>`;
+      } else {
+        tendHtml=`<span style="font-size:13px;font-weight:700;color:#AB1930">${d}</span>`;
+      }
+    }return`<tr class="${nx?'neix':''}" style="border-bottom:1px solid #f2f0ec"><td style="font-weight:${nx?700:500};padding:11px 14px;color:${nx?'#AB1930':'#1a1a1a'}">${row.n}</td><td class="r" style="padding:11px 14px"><span class="rbadge" style="background:${rbc(row.r)}">#${row.r}</span></td><td class="c" style="padding:11px 14px">${tendHtml}</td></tr>`;}).join('')}</tbody></table>`;
+}
+function buildP5(){
+  const neix=D.find(a=>a.nx);if(!neix){document.getElementById('neix-summary-panel').innerHTML='<div class="card" style="text-align:center;color:#888;padding:40px">Sin datos</div>';return;}
+  const highlights=INDS_DEF.map(ind=>{const rank=neixRank(ind.k,ind.exclCent);const fmt=fmtInd(ind.type);const val=neix[ind.k];const avg=mktAvg(ind.k,ind.exclCent);return rank?{l:ind.l,val:fmt(val),rank,avg:fmt(avg)}:null;}).filter(Boolean).sort((a,b)=>a.rank.pos-b.rank.pos);
+  const topCards=highlights.slice(0,4).map(h=>`<div class="nh"><div class="nh-label">${h.l}</div><div class="nh-val">${h.val}</div><div class="nh-rank">${h.rank.pos}° de ${h.rank.total} ALyCs · Prom: ${h.avg}</div></div>`).join('');
+  const tableRows=INDS_DEF.map(ind=>{const rank=neixRank(ind.k,ind.exclCent);const fmt=fmtInd(ind.type);const val=neix[ind.k];const avg=mktAvg(ind.k,ind.exclCent);if(!rank)return'';const color=rank.pos<=rank.total*0.3?'#004836':rank.pos<=rank.total*0.6?'#476785':'#AB1930';const bW=Math.round((1-rank.pos/rank.total)*100);const ex=ind.exclCent?' <span style="font-size:10px;color:#aaa">(excl. Centaurus)</span>':'';return`<tr style="border-bottom:1px solid #f2f0ec"><td style="padding:11px 14px;font-weight:500">${ind.lf}${ex}</td><td class="r" style="padding:11px 14px;font-weight:700;color:#AB1930">${fmt(val)}</td><td class="r" style="padding:11px 14px;color:#888">${fmt(avg)}</td><td style="padding:11px 14px;min-width:180px"><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;background:#eee;border-radius:4px;height:8px;overflow:hidden"><div style="width:${bW}%;background:${color};height:100%;border-radius:4px"></div></div><span style="font-size:12px;font-weight:700;color:${color};min-width:60px">${rank.pos}° / ${rank.total}</span></div></td></tr>`;}).join('');
+  const nRB={a:RANK.a.find(r=>r.n.toLowerCase().includes('neix')),c:RANK.c.find(r=>r.n.toLowerCase().includes('neix')),r:RANK.r.find(r=>r.n.toLowerCase().includes('neix'))};
+  const bymaCards=['a','c','r'].map((t,i)=>{const tipo=['Acciones','CEDEARs','Renta Fija'][i];const nr=nRB[t];if(!nr)return'';const d=nr.d;const tH=d!=null&&d!==0?(d>0?`<span style="color:#004836;font-size:12px;font-weight:600">↑ subió ${d}</span>`:`<span style="color:#AB1930;font-size:12px;font-weight:600">↓ bajó ${Math.abs(d)}</span>`):'';return`<div style="background:#fff;border:1px solid rgba(171,25,48,0.2);border-radius:10px;padding:16px 20px;flex:1"><div style="font-size:10px;color:#9A8E7D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">${tipo}</div><div style="font-family:'DM Serif Display',Georgia,serif;font-size:22px;font-weight:700;color:#AB1930">#${nr.r}</div><div style="font-size:11px;color:#888;margin-top:4px">${tH} vs ${RANK_DATE_PREV}</div></div>`;}).join('');
+  document.getElementById('neix-summary-panel').innerHTML=`<div class="neix-summary"><h3>⬥ Posicionamiento de Neix S.A. — Resumen Ejecutivo</h3><div class="neix-highlights">${topCards}</div></div><div class="card" style="margin-bottom:16px"><div class="ctitle">Rankings BYMA — Neix S.A.</div><div style="display:flex;gap:14px">${bymaCards}</div></div><div class="card"><div class="ctitle">Neix vs. Mercado — Todos los Indicadores</div><div class="tw"><table><thead><tr><th>Indicador</th><th class="r">Neix</th><th class="r">Prom. Mercado</th><th>Ranking (mejor → peor)</th></tr></thead><tbody>${tableRows}</tbody></table></div></div>`;
+}
+
+// Init: show hardcoded data immediately, then auto-refresh from Sheets silently
+(function(){
+  D.forEach(a=>{
+    a.nx=a.n.toLowerCase().includes('neix');
+    a.isCentaurus=a.n.toLowerCase().includes('centaurus');
+    a.mar=(a.it&&a.res!=null)?a.res/a.it:null;
+    if(a.gt!=null)a.gtAbs=Math.abs(a.gt);
+  });
+  renderAll();
+  document.getElementById('ts').textContent='Actualizando...';
+  // Fetch fresh data from Sheets silently in background
+  refreshFromSheets(true);
+})();
+</script>
+</body>
+</html>
