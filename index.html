@@ -337,7 +337,7 @@ const INDS_DEF=[
   {k:'liq',l:'Liquidez',lf:'Ratio de Liquidez (AC / PC)',type:'x',exclCent:false},
   {k:'ef',l:'Eficiencia',lf:'Eficiencia Operativa (Gastos / Ingresos)',type:'pct2',exclCent:false},
   {k:'mar',l:'Margen Neto',lf:'Margen Neto (Resultado / Ingresos Totales)',type:'pct2',exclCent:true},
-  {k:'ipe',l:'Gan. por Empleado',lf:'Ganancia por Empleado (Ingresos / Empleados)',type:'$',exclCent:false},
+  {k:'ipe',l:'Gan. por Empleado',lf:'Ingreso por Empleado (Ingresos / Empleados)',type:'$',exclCent:false},
 ];
 function fmtInd(t){if(t==='pct2')return v=>v==null||isNaN(v)?'—':(v*100).toFixed(2)+'%';if(t==='x')return v=>v==null||isNaN(v)?'—':v.toFixed(2)+'x';return fa;}
 function fa(v){if(v==null||isNaN(v))return'—';const n=Number(v),a=Math.abs(n),p=n<0?'-$':'$';if(a>=1e9)return p+(a/1e9).toFixed(1)+'B';if(a>=1e6)return p+(a/1e6).toFixed(0)+'M';if(a>=1e3)return p+(a/1e3).toFixed(0)+'K';return p+a.toFixed(0);}
