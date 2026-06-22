@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Clientes Corporativos</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --grafito:  #3D3D3D;
+  --bordeaux: #AB1930;
+  --crema:    #EBEBEB;
+  --arena:    #9A8E7D;
+  --card:     #FFFFFF;
+  --border:   rgba(154,142,125,0.25);
+  --shadow:   0 1px 3px rgba(61,61,61,0.08), 0 4px 16px rgba(61,61,61,0.06);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--crema); color: var(--grafito); min-height: 100vh; font-size: 14px; }
+
+/* HEADER */
+.header { background: var(--grafito); padding: 20px 0; border-bottom: 3px solid var(--bordeaux); }
+.header-inner { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; }
+.header-left { display: flex; align-items: center; gap: 28px; }
+.header-divider { border-left: 1px solid rgba(255,255,255,0.15); padding-left: 28px; }
+.header-left h1 { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.02em; line-height: 1.2; }
+.header-left p { font-size: 11px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; font-weight: 400; }
+.refresh-btn { display: flex; align-items: center; gap: 7px; padding: 9px 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 7px; color: rgba(255,255,255,0.75); font-size: 12px; font-family: inherit; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.refresh-btn:hover { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3); }
+.refresh-btn:active { transform: scale(0.97); }
+.refresh-btn.loading svg { animation: spin 0.8s linear infinite; }
+
+/* TABS */
+.tabs-wrap { background: var(--grafito); padding: 12px 0; border-bottom: none; }
+.tabs { width: 100%; display: flex; justify-content: center; }
+.tabs-inner { display: flex; gap: 8px; padding: 0 40px; width: 100%; }
+.tab { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 12px 20px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.15s; white-space: nowrap; font-family: inherit; border: none; background: rgba(255,255,255,0.08); border-radius: 8px; letter-spacing: 0.01em; }
+.tab:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.13); }
+.tab.active { color: var(--grafito); background: #fff; font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+.tab-icon { font-size: 14px; }
+
+/* LOADING */
+.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; gap: 16px; color: var(--arena); }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--bordeaux); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-msg { text-align: center; padding: 48px; color: var(--bordeaux); font-size: 13px; }
+
+/* MAIN */
+.main { max-width: 1200px; margin: 0 auto; padding: 28px 40px; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* KPI */
+.kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.kpi-card { background: var(--card); border-radius: 10px; padding: 20px 22px 18px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--bordeaux); border-radius: 10px 10px 0 0; }
+.kpi-card.k2::before { background: var(--grafito); }
+.kpi-card.k3::before { background: var(--bordeaux); opacity: 0.6; }
+.kpi-card.k4::before { background: var(--arena); }
+.kpi-label { font-size: 11px; font-weight: 500; color: var(--arena); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.08em; }
+.kpi-value { font-size: 48px; font-weight: 700; color: var(--grafito); line-height: 1; letter-spacing: -0.02em; font-family: 'DM Mono', monospace; }
+.kpi-sub { font-size: 12px; color: var(--arena); margin-top: 8px; font-weight: 400; }
+
+/* GRIDS */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+/* CARD */
+.card { background: var(--card); border-radius: 10px; padding: 22px; box-shadow: var(--shadow); border-top: 3px solid var(--bordeaux); }
+.card-title { font-size: 13px; font-weight: 600; color: var(--grafito); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border); letter-spacing: -0.01em; }
+
+/* FUNNEL */
+.funnel-wrap { display: flex; flex-direction: column; gap: 6px; padding: 4px 0; }
+.funnel-step { display: flex; align-items: center; gap: 12px; }
+.funnel-bar-wrap { flex: 1; height: 32px; }
+.funnel-bar { height: 100%; border-radius: 5px; display: flex; align-items: center; padding-left: 12px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.funnel-bar-label { font-size: 11px; font-weight: 600; color: #fff; white-space: nowrap; }
+.funnel-step-label { width: 105px; font-size: 11px; color: var(--arena); text-align: right; flex-shrink: 0; font-weight: 400; }
+.funnel-pct { width: 36px; font-size: 11px; font-weight: 600; color: var(--arena); flex-shrink: 0; text-align: right; font-family: 'DM Mono', monospace; }
+.funnel-connector { width: 100%; display: flex; justify-content: center; }
+.funnel-connector-line { width: 1px; height: 5px; background: var(--arena); opacity: 0.25; }
+
+/* DONUT */
+.donut-wrap { display: flex; align-items: center; gap: 22px; }
+.donut-svg { flex-shrink: 0; }
+.donut-legend { flex: 1; }
+.legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-name { font-size: 12px; color: var(--grafito); flex: 1; }
+.legend-val { font-size: 13px; font-weight: 700; color: var(--grafito); font-family: 'DM Mono', monospace; }
+.legend-pct { font-size: 11px; color: var(--arena); margin-left: 4px; }
+
+/* PROGRESS */
+.prog-wrap { display: flex; flex-direction: column; gap: 16px; }
+.prog-row { display: flex; flex-direction: column; gap: 6px; }
+.prog-top { display: flex; justify-content: space-between; font-size: 12px; }
+.prog-top span:first-child { color: var(--grafito); font-weight: 500; }
+.prog-top span:last-child { font-weight: 700; font-family: 'DM Mono', monospace; }
+.prog-track { height: 6px; background: rgba(154,142,125,0.18); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; }
+
+/* BADGES */
+.badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.badge-si    { background: rgba(171,25,48,0.10); color: var(--bordeaux); }
+.badge-proc  { background: rgba(154,142,125,0.15); color: var(--arena); }
+.badge-no    { background: rgba(154,142,125,0.10); color: var(--arena); }
+.badge-opera { background: rgba(171,25,48,0.10); color: var(--bordeaux); }
+.badge-noop  { background: rgba(154,142,125,0.10); color: var(--arena); }
+.badge-uw    { background: var(--grafito); color: #fff; }
+
+/* SECTION TITLE */
+.sec-title { font-size: 18px; font-weight: 700; color: var(--grafito); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); letter-spacing: -0.02em; }
+
+/* PIPELINE */
+.pipeline-wrap { display: flex; gap: 14px; align-items: flex-start; }
+.pipe-col { flex: 1; display: flex; flex-direction: column; }
+.pipe-header { padding: 12px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #fff; border-radius: 8px 8px 0 0; }
+.pipe-header.si { background: var(--bordeaux); }
+.pipe-header.proc { background: var(--grafito); }
+.pipe-header.no { background: var(--arena); }
+.pipe-body { border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; overflow: hidden; background: var(--card); }
+.pipe-item { padding: 9px 14px; font-size: 12px; border-bottom: 1px solid rgba(154,142,125,0.12); color: var(--grafito); display: flex; justify-content: space-between; align-items: center; }
+.pipe-item:last-child { border-bottom: none; }
+.pipe-item:hover { background: #faf9f7; }
+
+/* SEARCH & FILTERS */
+.controls { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+.search-input { flex: 1; min-width: 200px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: inherit; background: #fff; color: var(--grafito); outline: none; transition: border 0.15s; }
+.search-input:focus { border-color: var(--arena); }
+.filter-btn { padding: 8px 16px; border: 1px solid var(--border); background: #fff; border-radius: 7px; font-size: 11px; font-family: inherit; cursor: pointer; color: var(--arena); transition: all 0.15s; font-weight: 500; letter-spacing: 0.03em; }
+.filter-btn:hover { border-color: var(--arena); color: var(--grafito); }
+.filter-btn.active { background: var(--bordeaux); color: #fff; border-color: var(--bordeaux); }
+
+/* LOGO GRID */
+.logo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.logo-card { background: var(--card); border-radius: 10px; padding: 16px 12px 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; gap: 8px; border-top: 2px solid transparent; transition: box-shadow 0.15s, transform 0.15s; }
+.logo-card:hover { box-shadow: 0 8px 24px rgba(61,61,61,0.12); transform: translateY(-2px); }
+.logo-card.si { border-top-color: var(--bordeaux); }
+.logo-card.proceso { border-top-color: var(--grafito); }
+.logo-card.no { border-top-color: var(--arena); }
+.logo-img-wrap { width: 80px; height: 44px; display: flex; align-items: center; justify-content: center; }
+.logo-img-wrap img { max-width: 80px; max-height: 44px; object-fit: contain; }
+.logo-fallback { width: 80px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--arena); border-radius: 6px; background: rgba(154,142,125,0.1); letter-spacing: -0.02em; }
+.logo-name { font-size: 10px; font-weight: 500; color: var(--grafito); line-height: 1.3; width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.logo-badges { display: flex; gap: 3px; flex-wrap: wrap; justify-content: center; }
+.logo-filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.logo-search-wrap { position: relative; margin-bottom: 14px; }
+.logo-search-wrap input { width: 100%; padding: 9px 14px 9px 36px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: inherit; background: #fff; color: var(--grafito); outline: none; transition: border 0.15s; }
+.logo-search-wrap input:focus { border-color: var(--arena); }
+.logo-search-wrap .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #bbb; pointer-events: none; display: flex; align-items: center; }
+.empty-state { text-align: center; padding: 56px 24px; color: var(--arena); }
+.empty-state p { font-size: 13px; }
+
+/* TABLE */
+.empresa-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.empresa-table th { background: var(--grafito); color: rgba(255,255,255,0.7); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 11px 14px; text-align: left; font-weight: 600; cursor: pointer; user-select: none; white-space: nowrap; }
+.empresa-table th:hover { background: #4a4a4a; color: #fff; }
+.empresa-table th .sort-arrow { margin-left: 4px; opacity: 0.4; }
+.empresa-table th.sorted .sort-arrow { opacity: 1; color: var(--bordeaux); }
+.empresa-table td { padding: 10px 14px; border-bottom: 1px solid rgba(154,142,125,0.12); color: var(--grafito); }
+.empresa-table tr:hover td { background: #faf9f7; }
+.empresa-table tr:last-child td { border-bottom: none; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .kpi-row { grid-template-columns: repeat(2,1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .pipeline-wrap { flex-direction: column; }
+  .main { padding: 16px 20px; }
+  .header-inner { padding: 0 20px; }
+  .tabs-inner { padding: 0 12px; gap: 6px; }
+  .logo-grid { grid-template-columns: repeat(2, 1fr); }
+  .kpi-value { font-size: 38px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 362" style="height:36px;width:auto;flex-shrink:0">
+        <polygon fill="#AB1930" points="903.6 134.65 941.09 78.2 985.97 78.2 948.48 134.65 903.6 134.65"/>
+        <rect fill="#FFFFFF" x="660.23" y="78.2" width="44.88" height="215.67"/>
+        <polygon fill="#FFFFFF" points="542.86 115.16 542.86 78.18 405.26 78.18 405.26 78.2 394.59 78.2 394.59 293.87 439.47 293.87 439.47 293.86 542.86 293.86 542.86 256.88 439.47 256.88 439.47 202.62 529.47 202.62 529.47 165.64 439.47 165.64 439.47 115.16 542.86 115.16"/>
+        <polygon fill="#FFFFFF" points="277.26 293.08 277.26 78.2 235.28 78.2 235.28 230 134.24 78.2 89.36 78.2 89.38 78.23 89.3 78.2 89.3 293.98 131.28 293.98 131.28 141.19 232.91 293.87 277.79 293.87 277.26 293.08"/>
+        <polygon fill="#FFFFFF" points="989.85 293.87 846.31 78.2 801.42 78.2 869.57 180.59 794.17 293.87 839.05 293.87 892.01 214.31 944.97 293.87 989.85 293.87"/>
+      </svg>
+      <div class="header-divider">
+        <p>Análisis de Cartera</p>
+        <h1>Dashboard Clientes Corporativos</h1>
+      </div>
+    </div>
+    <button class="refresh-btn" onclick="refreshData()" id="refreshBtn">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M11.5 6.5A5 5 0 1 1 9.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <polyline points="9.5,0.5 9.5,2.5 11.5,2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Actualizar datos
+    </button>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <div class="tabs-inner">
+      <div class="tab active" onclick="showTab('resumen',this)"><span class="tab-icon">⌂</span> Resumen</div>
+      <div class="tab" onclick="showTab('pipeline',this)"><span class="tab-icon">▦</span> Pipeline</div>
+      <div class="tab" onclick="showTab('logos',this)"><span class="tab-icon">◈</span> Empresas</div>
+      <div class="tab" onclick="showTab('empresas',this)"><span class="tab-icon">≡</span> Tabla</div>
+    </div>
+  </div>
+</div>
+
+<div class="main" id="mainContent">
+  <div class="loading" id="loadingState">
+    <div class="spinner"></div>
+    <span>Cargando datos...</span>
+  </div>
+</div>
+
+<script>
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWQlhnvoWYG274tX3ZW8OLp4h6XKTCm0X12RGf8Z11Se4vUpmodThdPckY3miTKJuOGHFlPaQXMma7/pub?gid=0&single=true&output=csv';
+
+const LOGOS = {
+  "Mercado Libre":"logos/mercado-libre.png","YPF":"logos/ypf.png","Molinos Río de la Plata":"logos/molinos.png",
+  "Mercedes Benz":"logos/mercedes-benz.png","Techint":"logos/techint.png","Loma Negra":"logos/loma-negra.png",
+  "Pecom":"logos/pecom.png","Genneia":"logos/genneia.png","Adecco":"logos/adecco.png",
+  "Aeropuertos Argentina 2000":"logos/aeropuertos-argentina-2000.png","Sacde":"logos/sacde.png","Vista":"logos/vista.png",
+  "Laboratorios Richmond":"logos/laboratorios-richmond.png","Fratelli Branca":"logos/fratelli-branca.png",
+  "Reginald Lee - Coca Cola":"logos/reginald-lee-coca-cola.jpg","San Miguel":null,"Tango Energy":"logos/tango-energy.png",
+  "Minera Exar":"logos/minera-exar.png","Fiplasto":"logos/fiplasto.png","Laboratorios Gador":"logos/laboratorios-gador.png",
+  "Oliovita":"logos/oliovita.png","Tarjeta Naranja":"logos/tarjeta-naranja.png","Dexter":"logos/dexter.png",
+  "Conuar":"logos/conuar.png","Refinor":"logos/refinor.png","Bagó":"logos/bago.png","McDonald's":"logos/mcdonalds.png",
+  "Danone":"logos/danone.png","Adidas":"logos/adidas.png","Ledesma":"logos/ledesma.png","Ualá":"logos/uala.png",
+  "Capsa Capex":"logos/capsa-capex.png","Edenor":"logos/edenor.png","Directv":"logos/directv.png","Ford":"logos/ford.png",
+  "Nestlé":"logos/nestle.png","Farmacity":"logos/farmacity.png","L'Oréal":"logos/loreal.png","Coca-Cola":"logos/coca-cola.png",
+  "Andreani":"logos/andreani.png","Globant":"logos/globant.png","Samsung":"logos/samsung.png","Carrefour":"logos/carrefour.png",
+  "Netflix":"logos/netflix.png","Accenture":"logos/accenture.png","Nike":"logos/nike.png","Banco Macro":"logos/banco-macro.png",
+  "Apple":"logos/apple.png","Volkswagen":"logos/volkswagen.png","Pan American Energy":"logos/pan-american-energy.png",
+  "Pfizer":"logos/pfizer.png","Renault":"logos/renault.png","Visa":"logos/visa.png","Unilever":"logos/unilever.png",
+  "PepsiCo":"logos/pepsico.png","Havanna":"logos/havanna.png","Toyota":"logos/toyota.png","Arcor":"logos/arcor.png",
+  "Natura":"logos/natura.png","Cervecería y Maltería Quilmes":"logos/quilmes.png","Google":"logos/google.png"
+};
+
+// ── CSV FETCH ──────────────────────────────────────────────
+function parseCSV(text) {
+  // Remove BOM and normalize line endings
+  text = text.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const lines = text.trim().split('\n');
+
+  function parseLine(line) {
+    const result = [];
+    let cur = '', inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQuotes && line[i+1] === '"') { cur += '"'; i++; }
+        else inQuotes = !inQuotes;
+      } else if (ch === ',' && !inQuotes) {
+        result.push(cur.trim()); cur = '';
+      } else {
+        cur += ch;
+      }
+    }
+    result.push(cur.trim());
+    return result;
+  }
+
+  return lines.slice(1)
+    .map(l => parseLine(l))
+    .filter(r => r[0])
+    .map(r => [r[0]||'', r[2]||'', r[3]||'', r[4]||'']);
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error('Error al cargar');
+    const text = await res.text();
+    const data = parseCSV(text);
+    console.log('Primeras 3 filas parseadas:', data.slice(0,3));
+    initDashboard(data);
+  } catch(e) {
+    document.getElementById('mainContent').innerHTML = `<div class="error-msg">⚠️ No se pudieron cargar los datos.<br><small>${e.message}</small></div>`;
+  }
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function showTab(id, el) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── MAIN INIT ─────────────────────────────────────────────
+function initDashboard(DATA) {
+  document.getElementById('mainContent').innerHTML = `
+  <div class="section active" id="tab-resumen">
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="kpi-label">Total Universo</div><div class="kpi-value" id="kpiTotal">–</div><div class="kpi-sub">Empresas relevadas</div></div>
+      <div class="kpi-card k2"><div class="kpi-label">Clientes Activos</div><div class="kpi-value" id="kpiSi">–</div><div class="kpi-sub">Confirmados</div></div>
+      <div class="kpi-card k3"><div class="kpi-label">En Proceso</div><div class="kpi-value" id="kpiProc">–</div><div class="kpi-sub">En negociación</div></div>
+      <div class="kpi-card k4"><div class="kpi-label">Potencial</div><div class="kpi-value" id="kpiNo">–</div><div class="kpi-sub">No clientes aún</div></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card"><div class="card-title">Funnel de Conversión</div><div class="funnel-wrap" id="funnelChart"></div></div>
+      <div class="card"><div class="card-title">Indicadores Clave</div><div class="prog-wrap" id="progWrap"></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><div class="card-title">Operatividad — Clientes Activos</div><div class="donut-wrap"><svg class="donut-svg" width="130" height="130" viewBox="0 0 130 130" id="donutOpera"></svg><div class="donut-legend" id="legendOpera"></div></div></div>
+      <div class="card"><div class="card-title">Underwriting — Clientes Activos</div><div class="donut-wrap"><svg class="donut-svg" width="130" height="130" viewBox="0 0 130 130" id="donutUW"></svg><div class="donut-legend" id="legendUW"></div></div></div>
+    </div>
+  </div>
+
+  <div class="section" id="tab-pipeline">
+    <div class="sec-title">Pipeline Comercial</div>
+    <div class="pipeline-wrap" id="pipelineWrap"></div>
+  </div>
+
+  <div class="section" id="tab-logos">
+    <div class="sec-title">Empresas del Universo</div>
+    <div class="logo-search-wrap">
+      <span class="search-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="#bbb" stroke-width="1.2"/><line x1="9.5" y1="9.5" x2="12.5" y2="12.5" stroke="#bbb" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+      <input type="text" id="logoSearch" placeholder="Buscar empresa..." oninput="filterLogos()">
+    </div>
+    <div class="logo-filter-row" id="logoFilterRow">
+      <button class="filter-btn active" onclick="setLogoFilter('all',this)">Todas</button>
+      <button class="filter-btn" onclick="setLogoFilter('Si',this)">Clientes</button>
+      <button class="filter-btn" onclick="setLogoFilter('En proceso',this)">En proceso</button>
+      <button class="filter-btn" onclick="setLogoFilter('No',this)">Potenciales</button>
+    </div>
+    <div class="logo-grid" id="logoGrid"></div>
+  </div>
+
+  <div class="section" id="tab-empresas">
+    <div class="sec-title">Todas las Empresas</div>
+    <div class="controls">
+      <input class="search-input" id="searchInput" placeholder="Buscar empresa..." oninput="filterTable()">
+      <button class="filter-btn active" onclick="setFilter('all',this)">Todas</button>
+      <button class="filter-btn" onclick="setFilter('Si',this)">Clientes</button>
+      <button class="filter-btn" onclick="setFilter('En proceso',this)">En proceso</button>
+      <button class="filter-btn" onclick="setFilter('No',this)">Potenciales</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="empresa-table">
+        <thead><tr>
+          <th onclick="sortTable(0)"># <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable(1)">Empresa <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable(2)">Cliente <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable(3)">UW <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable(4)">Otros Productores <span class="sort-arrow">↕</span></th>
+        </tr></thead>
+        <tbody id="empresaTbody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--arena)" id="tableCount"></div>
+  </div>`;
+
+  // KPIs
+  const si    = DATA.filter(d=>d[1]==='Si').length;
+  const proc  = DATA.filter(d=>d[1]==='En proceso').length;
+  const no    = DATA.filter(d=>d[1]==='No').length;
+  const total = DATA.length;
+  document.getElementById('kpiTotal').textContent = total;
+  document.getElementById('kpiSi').textContent    = si;
+  document.getElementById('kpiProc').textContent  = proc;
+  document.getElementById('kpiNo').textContent    = no;
+
+  // FUNNEL
+  const operan  = DATA.filter(d=>d[1]==='Si'&&d[3]==='Opera').length;
+  const pipeline = si + proc;
+  const steps = [
+    {label:'Universo total', val:total,    pct:100,                              color:'#3D3D3D'},
+    {label:'En pipeline',    val:pipeline, pct:Math.round(pipeline/total*100),   color:'#7A7A7A'},
+    {label:'Clientes',       val:si,       pct:Math.round(si/total*100),         color:'#AB1930'},
+    {label:'Operan',         val:operan,   pct:Math.round(operan/total*100),      color:'#8B1526'},
+  ];
+  document.getElementById('funnelChart').innerHTML = steps.map((s,i)=>`
+    <div class="funnel-step">
+      <div class="funnel-step-label">${s.label}</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${Math.max(s.val/total*100,8)}%;background:${s.color}"><span class="funnel-bar-label">${s.val}</span></div></div>
+      <div class="funnel-pct">${s.pct}%</div>
+    </div>${i<steps.length-1?'<div class="funnel-connector"><div class="funnel-connector-line"></div></div>':''}`
+  ).join('');
+
+  // INDICADORES
+  const opera_pct = Math.round(DATA.filter(d=>d[1]==='Si'&&d[3]==='Opera').length / si * 100);
+  const uw_pct    = Math.round(DATA.filter(d=>d[1]==='Si'&&d[2]==='Si').length / si * 100);
+  const conv_pct  = Math.round(si / total * 100);
+  const pipe_pct  = Math.round(pipeline / total * 100);
+  document.getElementById('progWrap').innerHTML = [
+    {label:'Tasa de conversión',  pct:conv_pct,  color:'var(--bordeaux)'},
+    {label:'Clientes que operan', pct:opera_pct, color:'var(--grafito)'},
+    {label:'Clientes con UW',     pct:uw_pct,    color:'var(--bordeaux)'},
+    {label:'Pipeline activo',     pct:pipe_pct,  color:'var(--grafito)'},
+  ].map(p=>`<div class="prog-row">
+    <div class="prog-top"><span>${p.label}</span><span style="color:${p.color}">${p.pct}%</span></div>
+    <div class="prog-track"><div class="prog-fill" style="width:${p.pct}%;background:${p.color}"></div></div>
+  </div>`).join('');
+
+  // DONUTS
+  const clientesSi = DATA.filter(d=>d[1]==='Si');
+  drawDonut('donutOpera','legendOpera',[
+    {label:'Opera',    val:clientesSi.filter(d=>d[3]==='Opera').length,    color:'#AB1930'},
+    {label:'No opera', val:clientesSi.filter(d=>d[3]==='No opera').length, color:'#D8D8D8'},
+  ]);
+  drawDonut('donutUW','legendUW',[
+    {label:'Con UW', val:clientesSi.filter(d=>d[2]==='Si').length, color:'#3D3D3D'},
+    {label:'Sin UW', val:clientesSi.filter(d=>d[2]==='No').length, color:'#D8D8D8'},
+  ]);
+
+  // PIPELINE
+  const groups = {Si:DATA.filter(d=>d[1]==='Si'),'En proceso':DATA.filter(d=>d[1]==='En proceso'),No:DATA.filter(d=>d[1]==='No')};
+  const plabels = {Si:'Clientes','En proceso':'En Proceso',No:'Potenciales'};
+  const pcls    = {Si:'si','En proceso':'proc',No:'no'};
+  let phtml = '';
+  for(const[key,items] of Object.entries(groups)){
+    phtml+=`<div class="pipe-col"><div class="pipe-header ${pcls[key]}">${plabels[key]} <span style="opacity:.7;font-weight:400">(${items.length})</span></div><div class="pipe-body">`;
+    items.forEach(d=>{
+      const tags=[];
+      if(d[2]==='Si') tags.push(`<span class="badge badge-uw">UW</span>`);
+      if(d[3]==='Opera') tags.push(`<span class="badge badge-opera">Opera</span>`);
+      phtml+=`<div class="pipe-item"><span>${d[0]}</span><span style="display:flex;gap:4px">${tags.join('')}</span></div>`;
+    });
+    phtml+=`</div></div>`;
+  }
+  document.getElementById('pipelineWrap').innerHTML = phtml;
+
+  // LOGOS & TABLE
+  window._DATA = DATA;
+  window._currentLogoFilter = 'all';
+  window._currentFilter = 'all';
+  window._sortCol = -1;
+  window._sortAsc = true;
+  window._filteredData = [...DATA];
+  renderLogoGrid();
+  renderTable();
+}
+
+// ── DONUTS ────────────────────────────────────────────────
+function drawDonut(svgId,legendId,segments){
+  const svg=document.getElementById(svgId),legend=document.getElementById(legendId);
+  const cx=65,cy=65,r=50,ir=32,total=segments.reduce((a,s)=>a+s.val,0);
+  let angle=-Math.PI/2,html='';
+  segments.forEach(s=>{
+    const pct=s.val/total,a1=angle,a2=angle+pct*2*Math.PI;
+    const x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+    const ix1=cx+ir*Math.cos(a1),iy1=cy+ir*Math.sin(a1),ix2=cx+ir*Math.cos(a2),iy2=cy+ir*Math.sin(a2);
+    const large=pct>0.5?1:0;
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',`M ${ix1} ${iy1} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${ir} ${ir} 0 ${large} 0 ${ix1} ${iy1} Z`);
+    p.setAttribute('fill',s.color);svg.appendChild(p);
+    html+=`<div class="legend-item"><div class="legend-dot" style="background:${s.color}"></div><span class="legend-name">${s.label}</span><span class="legend-val">${s.val}</span><span class="legend-pct">(${Math.round(pct*100)}%)</span></div>`;
+    angle=a2;
+  });
+  legend.innerHTML=html;
+}
+
+// ── LOGOS ─────────────────────────────────────────────────
+function initials(n){return n.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+
+function renderLogoGrid(){
+  const q=(document.getElementById('logoSearch')||{value:''}).value.toLowerCase();
+  let rows=window._currentLogoFilter==='all'?window._DATA:window._DATA.filter(d=>d[1]===window._currentLogoFilter);
+  if(q) rows=rows.filter(d=>d[0].toLowerCase().includes(q));
+  const grid=document.getElementById('logoGrid');
+  if(!rows.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><p>No se encontraron empresas</p></div>`;return;}
+  grid.innerHTML=rows.map(d=>{
+    const src=LOGOS[d[0]],cls=d[1]==='Si'?'si':d[1]==='En proceso'?'proceso':'no';
+    const sb=d[1]==='Si'?`<span class="badge badge-si" style="font-size:9px;padding:1px 5px">Cliente</span>`:d[1]==='En proceso'?`<span class="badge badge-proc" style="font-size:9px;padding:1px 5px">Proceso</span>`:`<span class="badge badge-no" style="font-size:9px;padding:1px 5px">Potencial</span>`;
+    const ub=d[2]==='Si'?`<span class="badge badge-uw" style="font-size:9px;padding:1px 5px">UW</span>`:'';
+    const ob=d[3]==='Opera'?`<span class="badge badge-opera" style="font-size:9px;padding:1px 5px">Opera</span>`:'';
+    const lh=src?`<img src="${src}" alt="${d[0]}" style="max-width:80px;max-height:44px;object-fit:contain">`:`<div class="logo-fallback">${initials(d[0])}</div>`;
+    return `<div class="logo-card ${cls}"><div class="logo-img-wrap">${lh}</div><div class="logo-name">${d[0]}</div><div class="logo-badges">${sb}${ub}${ob}</div></div>`;
+  }).join('');
+}
+function filterLogos(){renderLogoGrid();}
+function setLogoFilter(f,btn){
+  window._currentLogoFilter=f;
+  document.querySelectorAll('#logoFilterRow .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderLogoGrid();
+}
+
+// ── TABLE ─────────────────────────────────────────────────
+function renderTable(){
+  const tbody=document.getElementById('empresaTbody');
+  if(!window._filteredData.length){
+    tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--arena)">No se encontraron empresas</td></tr>`;
+    document.getElementById('tableCount').textContent='0 empresas';return;
+  }
+  tbody.innerHTML=window._filteredData.map((d,i)=>{
+    const bc=d[1]==='Si'?'badge-si':d[1]==='En proceso'?'badge-proc':'badge-no';
+    const uw=d[2]==='Si'?`<span class="badge badge-uw">Si</span>`:`<span style="color:var(--arena);font-size:11px">–</span>`;
+    const op=d[3]==='Opera'?`<span class="badge badge-opera">Opera</span>`:`<span class="badge badge-noop">No opera</span>`;
+    return `<tr><td style="color:var(--arena);font-size:11px">${i+1}</td><td style="font-weight:500">${d[0]}</td><td><span class="badge ${bc}">${d[1]}</span></td><td>${uw}</td><td>${op}</td></tr>`;
+  }).join('');
+  document.getElementById('tableCount').textContent=`${window._filteredData.length} empresa${window._filteredData.length===1?'':'s'}`;
+}
+function applyFilters(){
+  const q=(document.getElementById('searchInput')||{value:''}).value.toLowerCase();
+  window._filteredData=window._DATA.filter(d=>(window._currentFilter==='all'||d[1]===window._currentFilter)&&(!q||d[0].toLowerCase().includes(q)));
+  if(window._sortCol>=0) applySort(); else renderTable();
+}
+function applySort(){
+  window._filteredData.sort((a,b)=>{
+    const va=window._sortCol===0?window._DATA.indexOf(a):a[window._sortCol-1]??'';
+    const vb=window._sortCol===0?window._DATA.indexOf(b):b[window._sortCol-1]??'';
+    return window._sortAsc?(va>vb?1:-1):(va<vb?1:-1);
+  });
+  renderTable();
+}
+function filterTable(){applyFilters();}
+function setFilter(f,btn){
+  window._currentFilter=f;
+  document.querySelectorAll('#tab-empresas .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');applyFilters();
+}
+function sortTable(col){
+  const ths=document.querySelectorAll('.empresa-table th');
+  ths.forEach(th=>th.classList.remove('sorted'));
+  if(window._sortCol===col) window._sortAsc=!window._sortAsc; else{window._sortCol=col;window._sortAsc=true;}
+  ths[col].classList.add('sorted');
+  ths[col].querySelector('.sort-arrow').textContent=window._sortAsc?'↑':'↓';
+  applyFilters();
+}
+
+// ── START ─────────────────────────────────────────────────
+async function refreshData() {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  await loadData();
+  btn.classList.remove('loading');
+  btn.disabled = false;
+}
+
+loadData();
+</script>
+</body>
+</html>
