@@ -472,18 +472,19 @@ function updResumen(){
   const fPct=v=>v==null||isNaN(v)?'—':(v*100).toFixed(2)+'%';
   const fX=v=>v==null||isNaN(v)?'—':v.toFixed(2)+'x';
   document.getElementById('kpi-grid').innerHTML=[{l:'Activo Total',v:fa(a.at),c:null},{l:'Pasivo Total',v:fa(a.pt),c:null},{l:'Patrimonio Neto',v:fa(a.pn),c:a.pn},{l:'ROE',v:fPct(a.roe),c:a.roe},{l:'Apalancamiento',v:fX(a.apal),c:null}].map(k=>`<div class="kpi"><div class="kpi-label">${k.l}</div><div class="kpi-value ${k.c!=null?(k.c>=0?'pos':'neg'):''}">${k.v}</div></div>`).join('');
-  document.getElementById('r-title').textContent='Composicion — '+a.n;
+  document.getElementById('r-title').textContent='Composicion — '+a.n+cierreSuf(a);
   mkCompChart('ch-r',[a.ac,a.anc,a.pc,a.pnc||0,a.pn],38);
 }
+function cierreSuf(a){return a.f?' · Cierre '+a.f+(a.periodoMeses?' ('+a.periodoMeses+' meses)':''):'';}
 function updPatChart(){
   if(!D.length)return;
   const a=D[+document.getElementById('sel1').value]||D[0];
-  document.getElementById('cht').textContent='Composicion Patrimonial — '+a.n;
+  document.getElementById('cht').textContent='Composicion Patrimonial — '+a.n+cierreSuf(a);
   mkCompChart('ch0',[a.ac,a.anc,a.pc,a.pnc||0,a.pn],44);
 }
 function renderPat(){
   const arr=getSortedFiltered('pat');const maxAt=Math.max(...D.map(a=>a.at||0));
-  document.getElementById('tbp').innerHTML=arr.map(a=>{const bW=a.at?Math.round(a.at/maxAt*80):0;return`<tr class="${a.nx?'neix':''}"><td style="color:${a.nx?'#AB1930':'#1a1a1a'};font-weight:${a.nx?700:400}">${a.n}</td><td style="color:#aaa;font-size:12px">${a.f}</td><td class="r ${a.pn>=0?'tp':'tn'} b">${fa(a.pn)}</td><td class="r">${fa(a.ac)}</td><td class="r">${fa(a.anc)}</td><td class="r b"><div class="mini-bar-w">${fa(a.at)}<div class="mini-bar" style="width:${bW}px;background:${a.nx?'#AB1930':'#476785'};opacity:.5"></div></div></td><td class="r">${fa(a.pc)}</td><td class="r">${a.pnc?fa(a.pnc):'$0'}</td><td class="r">${fa(a.pt)}</td></tr>`;}).join('');
+  document.getElementById('tbp').innerHTML=arr.map(a=>{const bW=a.at?Math.round(a.at/maxAt*80):0;return`<tr class="${a.nx?'neix':''}"><td style="color:${a.nx?'#AB1930':'#1a1a1a'};font-weight:${a.nx?700:400}">${a.n}</td><td style="color:#aaa;font-size:12px">${a.f}${a.periodoMeses?' ('+a.periodoMeses+'m)':''}</td><td class="r ${a.pn>=0?'tp':'tn'} b">${fa(a.pn)}</td><td class="r">${fa(a.ac)}</td><td class="r">${fa(a.anc)}</td><td class="r b"><div class="mini-bar-w">${fa(a.at)}<div class="mini-bar" style="width:${bW}px;background:${a.nx?'#AB1930':'#476785'};opacity:.5"></div></div></td><td class="r">${fa(a.pc)}</td><td class="r">${a.pnc?fa(a.pnc):'$0'}</td><td class="r">${fa(a.pt)}</td></tr>`;}).join('');
 }
 function renderEerr(){
   const arr=getSortedFiltered('eerr');
