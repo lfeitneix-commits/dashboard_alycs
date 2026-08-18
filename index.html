@@ -309,8 +309,12 @@ async function refreshFromSheets(silent){
       const m2=full.match(/^(.+?)\s+(\d{1,2}\/\d{2}\/\d{2,4})$/);
       if(m){nombre=m[1].trim();fecha=m[2];}else if(m2){nombre=m2[1].trim();fecha=m2[2];}
       const g=ri=>cR[ri]&&c<cR[ri].length?pnS(cR[ri][c]):null;
-      const a={n:nombre,f:fecha,ac:g(1),anc:g(2),at:g(3),pc:g(4),pnc:g(5),pt:g(6),pn:g(7),
-               isv:g(11),ga:g(15),gc:g(16),iigg:g(22),res:g(23),it:g(25),gt:g(26)};
+      const gs=ri=>cR[ri]&&c<cR[ri].length?String(cR[ri][c]||'').trim():'';
+      // Filas 1 y 2 = Fecha de cierre / Período (meses); el resto se corrió +2
+      if(gs(1))fecha=gs(1);
+      const a={n:nombre,f:fecha,periodoMeses:g(2),
+               ac:g(3),anc:g(4),at:g(5),pc:g(6),pnc:g(7),pt:g(8),pn:g(9),
+               isv:g(13),ga:g(17),gc:g(18),iigg:g(24),res:g(25),it:g(27),gt:g(28)};
       a.gtAbs=a.gt!=null?Math.abs(a.gt):null;
       a.nx=a.n.toLowerCase().includes('neix');
       a.isCentaurus=a.n.toLowerCase().includes('centaurus');
