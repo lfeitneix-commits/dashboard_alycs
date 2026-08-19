@@ -166,6 +166,7 @@ tr.neix:hover td{background:rgba(171,25,48,0.26)!important}
     <div class="search-w"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" placeholder="Buscar ALyC..." oninput="filterAndRender('eerr')"></div>
     <div class="tw" style="max-height:480px;overflow-y:auto"><table id="tbl-eerr"><thead><tr>
       <th class="sortable" onclick="sortTable('eerr','n',this)">ALyC <span class="sort-icon"></span></th>
+      <th>Cierre</th>
       <th class="r sortable" onclick="sortTable('eerr','res',this)">Resultado Periodo <span class="sort-icon"></span></th>
       <th class="r sortable" onclick="sortTable('eerr','it',this)">Ingresos Tot. <span class="sort-icon"></span></th>
       <th class="r sortable" onclick="sortTable('eerr','gtAbs',this)">Gastos Tot. <span class="sort-icon"></span></th>
@@ -488,7 +489,7 @@ function renderPat(){
 }
 function renderEerr(){
   const arr=getSortedFiltered('eerr');
-  document.getElementById('tbr').innerHTML=arr.map(a=>`<tr class="${a.nx?'neix':''}"><td style="color:${a.nx?'#AB1930':'#1a1a1a'};font-weight:${a.nx?700:400}">${a.n}</td><td class="r ${a.res!=null&&a.res>=0?'tp':'tn'} b">${fa(a.res)}</td><td class="r">${fa(a.it)}</td><td class="r tn">${fa(a.gtAbs)}</td><td class="r ${a.iigg!=null&&a.iigg>=0?'tp':'tn'}">${fa(a.iigg)}</td><td class="r" style="color:${a.gc!=null&&a.gc<0?'#AB1930':'#1a1a1a'}">${fa(a.gc)}</td><td class="r" style="color:${a.ga<0?'#AB1930':'#1a1a1a'}">${fa(a.ga)}</td></tr>`).join('');
+  document.getElementById('tbr').innerHTML=arr.map(a=>`<tr class="${a.nx?'neix':''}"><td style="color:${a.nx?'#AB1930':'#1a1a1a'};font-weight:${a.nx?700:400}">${a.n}</td><td style="color:#aaa;font-size:12px">${a.f}${a.periodoMeses?' ('+a.periodoMeses+'m)':''}</td><td class="r ${a.res!=null&&a.res>=0?'tp':'tn'} b">${fa(a.res)}</td><td class="r">${fa(a.it)}</td><td class="r tn">${fa(a.gtAbs)}</td><td class="r ${a.iigg!=null&&a.iigg>=0?'tp':'tn'}">${fa(a.iigg)}</td><td class="r" style="color:${a.gc!=null&&a.gc<0?'#AB1930':'#1a1a1a'}">${fa(a.gc)}</td><td class="r" style="color:${a.ga<0?'#AB1930':'#1a1a1a'}">${fa(a.ga)}</td></tr>`).join('');
 }
 function buildP2(){
   if(!D.length)return;
